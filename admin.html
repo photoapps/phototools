@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#0b0b10">
+<title>PhotoTools+ · Admin</title><link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{--bg:#0b0b10;--card:#15151d;--ln:#262633;--tx:#ecebf2;--mu:#9b9bb0;--ac:#e8a24a;--ac2:#f6c477;--ok:#6fcf97;--ko:#eb6a6a}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:22px;margin:0}h1 b{color:var(--ac)}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+input,button,select{font:inherit}select.ghost{background:#0f0f15;color:var(--tx)}select.ghost{background:#0f0f15;color:var(--tx)}
+input[type=text],input[type=password],input[type=number]{background:#0f0f15;border:1px solid var(--ln);color:var(--tx);border-radius:12px;padding:12px 14px;width:100%}
+.btn{background:var(--ac);color:#1a1206;font-weight:700;border:0;border-radius:12px;padding:12px 18px;cursor:pointer}
+.ghost{background:none;border:1px solid var(--ln);color:var(--tx);border-radius:10px;padding:7px 12px;cursor:pointer;font-size:14px}
+.ghost.warn{border-color:#6b3a3a;color:var(--ko)}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:16px;margin:12px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>input[type=text]{flex:1 1 200px;width:auto}.row>input[type=number]{width:84px}
+.mu{color:var(--mu);font-size:13px}
+.pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--ln)}
+.pill.on{color:var(--ok);border-color:#2f5a44}.pill.off{color:var(--ko);border-color:#6b3a3a}
+.p{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.name{font-weight:700;font-size:17px}
+.fn input[type=date]{width:100%;min-width:0;box-sizing:border-box;font-size:16px;height:50px;background:#0f0f15;border:1px solid var(--ln);color:var(--tx);border-radius:12px;padding:0 10px;font-family:inherit;color-scheme:dark}
+.apr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 8px;align-items:center;border-top:1px solid var(--ln);margin-top:8px;padding-top:8px;font-size:13px;color:var(--mu)}.apr .apn{overflow-wrap:anywhere}.apr .aps{grid-column:1/-1;width:100%;height:40px;font-size:14px;padding:0 10px;line-height:normal}
+.apr .ghost{padding:6px 10px}
+.apr .aps{grid-column:1/-1;width:100%;height:40px;font-size:14px;padding:0 10px;box-sizing:border-box;background:#0f0f15;border:1px solid var(--ln);color:var(--tx);border-radius:12px;font-family:inherit}
+@media(min-width:640px){.apr{grid-template-columns:minmax(0,1.5fr) minmax(0,1.2fr) auto;margin-top:0;padding:8px 0}.apr .aps{grid-column:auto;grid-row:1}.apr .apn{grid-row:1;grid-column:1}.apr .ghost{grid-row:1;grid-column:3}.apr .apn br{display:none}.apr .apn span.m{color:var(--mu);margin-left:8px}}
+#apBox summary{list-style:revert}
+.dev{border-top:1px solid var(--ln);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:13px;color:var(--mu)}
+.dev span{min-width:0;overflow-wrap:anywhere}
+.msg{margin-top:10px;white-space:pre-wrap;background:#0f0f15;border:1px solid var(--ln);border-radius:12px;padding:12px;font-size:14px}
+.err{color:var(--ko);font-size:14px;min-height:20px;margin-top:8px}
+.hide{display:none!important}
+.card.c .det{display:none}.card .p{cursor:pointer}.chev{color:var(--mu);font-size:12px;margin-left:6px;display:inline-block;transition:transform .15s}.card:not(.c) .chev{transform:rotate(90deg)}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+
+body.in{background:radial-gradient(1200px 600px at 50% -10%,#1c1a26 0,#0b0b10 60%)}
+.lg{min-height:calc(100vh - 80px);display:flex;align-items:center;justify-content:center}
+.lg .box{width:100%;max-width:380px;background:linear-gradient(180deg,#171722,#12121a);border:1px solid var(--ln);border-radius:22px;padding:32px 26px 26px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(232,162,74,.05) inset}
+.lg .mark{width:68px;height:68px;margin:0 auto 14px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 25%,#f6c477,#e8a24a 55%,#b5742b);box-shadow:0 8px 24px rgba(232,162,74,.35)}
+.lg h2{margin:0 0 4px;font-size:22px;letter-spacing:-.3px}.lg h2 b{color:var(--ac)}
+.lg .tag{color:var(--mu);font-size:14px;margin:0 0 22px}
+.pw{position:relative;margin-bottom:12px}
+.pw input{padding-right:46px;font-size:17px;text-align:left}
+.pw input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px rgba(232,162,74,.18)}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--mu);width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.eye:hover{color:var(--tx)}
+.lg .btn{width:100%;padding:14px;font-size:16px;display:flex;gap:8px;align-items:center;justify-content:center}
+.lg .btn[disabled]{opacity:.7;cursor:wait}
+.sp{width:16px;height:16px;border:2px solid rgba(26,18,6,.3);border-top-color:#1a1206;border-radius:50%;animation:r .8s linear infinite}@keyframes r{to{transform:rotate(360deg)}}
+.lg .err{min-height:22px;margin-top:12px}
+.shake{animation:sh .4s}@keyframes sh{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.lg .foot{margin-top:14px;color:var(--mu);font-size:12px;display:flex;gap:6px;align-items:center;justify-content:center}
+.top.lgtop{display:none}
+
+.fn{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.fl{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--mu);min-width:0}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fn input[type=text],.fn input[type=number],.sel{width:100%;min-width:0;font-size:16px;height:50px;padding-top:0;padding-bottom:0}
+.sel{background:#0f0f15;border:1px solid var(--ln);color:var(--tx);border-radius:12px;padding:12px 10px;font-family:inherit}
+.fn .btn{width:100%;padding:14px}
+.res{margin-top:14px;border:1px solid #2f5a44;background:#101a15;border-radius:14px;padding:14px}
+.res .t{font-weight:700;margin-bottom:8px;color:var(--ok)}
+.res .lnk{background:#0b0f0d;border:1px solid var(--ln);border-radius:10px;padding:10px 12px;font-size:13px;word-break:break-all;user-select:all;-webkit-user-select:all}
+.res .acts .btn,.res .acts .ghost{flex:1 1 140px;text-align:center}
+.p .name{min-width:0;overflow-wrap:anywhere}
+@media(max-width:420px){.st .s{display:none}.st{padding:10px 12px}.st .v{font-size:24px}.wrap{padding:14px 12px 56px}.card{padding:14px}.acts .ghost{flex:1 1 calc(50% - 6px);text-align:center}.dev{flex-direction:column;align-items:stretch}.dev .ghost{align-self:flex-end}}
+
+.wrap{max-width:900px}
+.sub{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:12.5px;margin:-6px 0 12px;flex-wrap:wrap}
+.sub .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(111,207,151,.6);animation:pl 2s infinite}@keyframes pl{70%{box-shadow:0 0 0 7px rgba(111,207,151,0)}100%{box-shadow:0 0 0 0 rgba(111,207,151,0)}}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0}
+@media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+.st{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:12px 14px;min-width:0}
+.st .v{font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.1}.st .l{color:var(--mu);font-size:12.5px;margin-top:2px}.st .s{color:var(--mu);font-size:11.5px;margin-top:2px;opacity:.85}
+.st.live .v{color:var(--ok)}.st.live{border-color:#2f5a44}
+.chart{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:14px 14px 10px;margin:10px 0}
+.chart .h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.chart svg{width:100%;height:auto;display:block;margin-top:8px}
+.leg{display:flex;gap:14px;font-size:12px;color:var(--mu);margin-top:4px}.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.now{background:var(--card);border:1px solid #2f5a44;border-radius:16px;padding:12px 14px;margin:10px 0}
+.now .t{font-size:13px;color:var(--ok);font-weight:700;margin-bottom:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ln);background:#0f0f15;border-radius:999px;padding:4px 11px;margin:0 6px 6px 0;font-size:13.5px;cursor:pointer;color:var(--tx)}
+.chip.sel{background:var(--ac);color:#1a1206;border-color:var(--ac);font-weight:700;width:auto;height:auto;padding:4px 11px;border-radius:999px}
+.chip small{color:var(--mu);font-size:11.5px}.chip.sel small{color:#3a2a10}
+.chips{display:flex;flex-wrap:wrap;margin-top:10px}
+.od{width:8px;height:8px;border-radius:50%;background:#555;display:inline-block;flex:none}.od.on{background:var(--ok);box-shadow:0 0 6px var(--ok)}.od.rec{background:var(--ac)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0;align-items:center}
+.tools input[type=text]{flex:1 1 180px;width:auto;padding:10px 14px}
+.tools .sel{width:auto;height:44px;font-size:14px;padding:0 10px;flex:0 0 auto}
+.ago{color:var(--mu);font-size:12.5px}
+.pill.ap{color:var(--ac2);border-color:#6b5230}
+.st.sup .v{color:#cdb0ff}
+.pill.sup{color:#cdb0ff;border-color:#b98cff}
+.pill.vip{color:#7fd6f0;border-color:#3f8fa8}
+.sup-box{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 4px;padding:12px;border:1px solid #3a3050;border-radius:12px;background:rgba(185,140,255,.08)}
+.sup-box.vb{border-color:#2d4a56;background:rgba(80,190,230,.07);margin-top:6px}.sup-box.vb b{color:#7fd6f0}
+.sup-box b{color:#cdb0ff}.sup-box .mu{font-size:12.5px;margin-top:2px}
+.sw{flex:none;width:46px;height:26px;border-radius:99px;border:1px solid var(--ln);background:#2a2a35;position:relative;padding:0;cursor:pointer}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.sw.on{background:#b98cff;border-color:#b98cff}.sw.on::after{left:22px}
+.igb{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 7px;margin-left:4px;border:1px solid var(--ln);vertical-align:1px}
+.igb.ok{color:var(--ok);border-color:#2f5a44}.igb.no{color:var(--ko);border-color:#6b3a3a}.igb.na,.igb.none,.igb.new{color:var(--mu)}
+.igf{display:block;width:100%;box-sizing:border-box;margin-top:10px;padding:14px;border:1.5px dashed var(--ln);border-radius:12px;text-align:center;color:var(--tx);cursor:pointer;font-size:14px}
+.igf input{display:none}
+.igw{border:1px solid #6b5230;background:#1a1408;color:var(--ac2);border-radius:10px;padding:8px 10px;margin-top:10px;font-size:13px}
+.qw{position:relative;flex:1 1 180px;display:flex}
+.qw input[type=text]{flex:1 1 auto;min-width:0;padding-right:40px}
+.qx{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:0;background:transparent;color:var(--mu);font-size:18px;line-height:1;cursor:pointer;display:none;padding:0}
+.qx.on{display:block}.qx:hover{color:var(--tx)}
+.rem{display:block;width:100%;box-sizing:border-box;text-align:left;border:1px solid #6b5230;background:#1a1408;color:var(--ac2);border-radius:12px;padding:12px 14px;margin:12px 0;font:inherit;font-size:14px;cursor:pointer}
+.rem b{color:var(--ac)}
+</style></head><body><div class="wrap">
+<div class="top" id="topbar"><h1>PhotoTools<b>+</b> · Admin</h1><button class="ghost hide" id="bOut">Salir</button></div>
+
+<div id="login" class="lg"><form class="box" id="fLogin" autocomplete="on">
+  <div class="mark"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1a1206" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r="1.2" fill="#1a1206"/></svg></div>
+  <h2>PhotoTools<b>+</b></h2>
+  <p class="tag">Panel de administración</p>
+  <input type="text" name="username" value="admin" autocomplete="username" class="hide" tabindex="-1" aria-hidden="true">
+  <div class="pw"><input type="password" id="pw" placeholder="Contraseña" autocomplete="current-password" autofocus aria-label="Contraseña de administrador"><button type="button" class="eye" id="eye" aria-label="Mostrar contraseña"><svg id="eyeI" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+  <button class="btn" type="submit" id="bGo"><span id="goT">Entrar</span></button>
+  <div class="err" id="eLogin" role="alert"></div>
+  <div class="foot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Acceso solo para el administrador</div>
+</form></div>
+
+<div id="app" class="hide">
+  <div class="sub"><span class="dot"></span><span id="upd">Actualizando…</span><button class="ghost" id="bRef" type="button" style="padding:4px 10px;font-size:12.5px">↻ Actualizar</button></div>
+  <button type="button" class="rem hide" id="igRem"></button>
+  <div class="stats" id="stats"></div>
+  <div class="now hide" id="nowBox"></div>
+  <div class="chart"><div class="h"><b style="font-size:14px">Actividad · últimos 14 días</b><span class="mu" id="chSum"></span></div><div id="chart"></div><div class="leg"><span><i style="background:var(--ac)"></i>Aperturas</span><span><i style="background:#8fb4ff"></i>Personas distintas</span></div></div>
+
+  <div class="card">
+    <b>Crear enlace nuevo</b>
+    <form id="fNew" class="fn" autocomplete="off">
+      <label class="fl">Nombre, usuario de Instagram o correo<input type="text" id="nom" placeholder="@ana_foto · ana@correo.com" maxlength="80" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+      <div class="fg">
+        <label class="fl">Máx. dispositivos<input type="number" id="max" value="4" min="1" max="50" inputmode="numeric"></label>
+        <label class="fl">Idioma del mensaje<select id="lang" class="sel"><option value="es">Castellano</option><option value="ca">Català</option><option value="en">English</option></select></label>
+      </div>
+      <button class="btn" type="submit">Crear enlace</button>
+    </form>
+    <div id="nuevo" class="hide"></div>
+    <div class="err" id="eApp"></div>
+  </div>
+
+  <details class="card hide" id="apBox">
+    <summary style="cursor:pointer;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>⭐ Apoyos recibidos</b><span class="mu" id="apSum"></span></summary>
+    <p class="mu" id="apHint" style="margin:10px 0 0;font-size:12.5px"></p>
+    <div id="apList" style="margin-top:6px"></div>
+    <datalist id="apDL"></datalist>
+    <form id="fAp" class="fn" autocomplete="off" style="margin-top:12px">
+      <b style="font-size:13px">Añadir apoyo nuevo</b>
+      <label class="fl">Nombre de quien apoya<input type="text" id="apN" maxlength="120" placeholder="Nombre como sale en PayPal"></label>
+      <div class="fg">
+        <label class="fl">Importe (€)<input type="number" id="apI" step="0.01" min="0.01" inputmode="decimal" placeholder="5,00"></label>
+        <label class="fl">Fecha<input type="date" id="apF"></label>
+      </div>
+      <label class="fl">Vincular a persona del panel (opcional)<input type="text" id="apP" list="apDL" placeholder="Escribe el nombre…" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+      <button class="btn" type="submit">Añadir apoyo</button>
+    </form>
+  </details>
+
+  <details class="card" id="igBox">
+    <summary style="cursor:pointer;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>📸 Seguidores de Instagram</b><span class="mu" id="igSum">Sin comprobar</span></summary>
+    <p class="mu" style="margin:10px 0 0;font-size:12.5px">Descarga tu lista desde Instagram (Configuración → Centro de cuentas → Tu información y permisos → Exportar tu información → Seguidores y seguidos, formato JSON) y súbela aquí. Se lee en este navegador: no se envía a ningún sitio. Si el archivo viene en varias partes (followers_1.json, followers_2.json…), selecciónalas todas.</p>
+    <label class="igf" id="igLbl"><input type="file" id="igFile" accept=".json,.html,application/json,text/html" multiple>📂 Elegir archivo(s) de seguidores</label>
+    <div class="err" id="igErr" role="alert"></div>
+    <div id="igRes" style="margin-top:10px"></div>
+  </details>
+
+  <div class="tools"><b id="cnt" style="flex:0 0 auto">Personas</b><span class="qw"><input type="text" id="q" placeholder="Buscar por nombre…" autocapitalize="off" autocorrect="off" spellcheck="false"><button type="button" class="qx" id="qx" aria-label="Borrar búsqueda">✕</button></span><select id="sort" class="sel"><option value="act">Última actividad</option><option value="nom">Nombre A–Z</option><option value="ape">Más aperturas</option><option value="new">Más recientes</option><option value="dev">Más dispositivos</option></select></div>
+  <div class="chips" id="flt"></div>
+  <div id="list"></div>
+</div>
+</div>
+<script>
+(function(){
+'use strict';
+var SB_URL='https://htskwweyxwlgnbeivugi.supabase.co',SB_KEY='sb_publishable__3EApIwiBv4AMbyJ-R-csQ_R7UeJ5Q5',pass='',data=[],open_={},ST=null,skew=0,filt='all',tmr=null,lastOk=0;
+function disp(u){u=u||'';var o=/iPad/.test(u)?'iPad':/iPhone/.test(u)?'iPhone':/Android/.test(u)?'Android':/Macintosh/.test(u)?'Mac':/Windows/.test(u)?'Windows':/Linux/.test(u)?'Linux':'';var n=/CriOS|Chrome\//.test(u)?'Chrome':/FxiOS|Firefox/.test(u)?'Firefox':/EdgiOS|Edg\//.test(u)?'Edge':/Safari/.test(u)?'Safari':'';var v=(/OS (\d+)[_\d]*/.exec(u)||/Android (\d+)/.exec(u)||[])[1];var r=[o+(v?' '+v:''),n].filter(Boolean).join(' · ');return r||u.slice(0,60)||'(sin datos)'}
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function rpc(fn,body){
+  return fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY},body:JSON.stringify(body)})
+   .then(function(r){if(!r.ok)throw new Error('http '+r.status);return r.json()});
+}
+function link(c){return location.origin+'/?k='+c}
+var MSG={
+es:function(l,m){return 'Aquí tienes tu acceso personal a PhotoTools+ 📸🌙\n\n👉 '+l+'\n\nEs un enlace solo para ti, así que no lo compartas. Funciona hasta en '+m+' dispositivos.\n\nPara tenerla como una app:\n• iPhone: ábrelo con Safari → Compartir → «Añadir a pantalla de inicio».\n• Android: ábrelo en Chrome → menú ⋮ → «Instalar aplicación».\n\nUna vez abierta la primera vez, también funciona sin conexión.\n\nSi cambias de móvil o necesitas más dispositivos, escríbeme por aquí y te lo arreglo. ¡Cualquier duda o sugerencia, dime!\n\nPhotoTools+ es un proyecto personal y gratuito. Si te resulta útil y quieres apoyarlo, dentro de la app hay un botón para invitarme a un café ☕. Es totalmente opcional.'},
+ca:function(l,m){return 'Aquí tens el teu accés personal a PhotoTools+ 📸🌙\n\n👉 '+l+'\n\nÉs un enllaç només per a tu, així que no el comparteixis. Funciona fins a '+m+' dispositius.\n\nPer tenir-la com una app:\n• iPhone: obre\u2019l amb Safari → Compartir → «Afegir a la pantalla d\u2019inici».\n• Android: obre\u2019l a Chrome → menú ⋮ → «Instal·lar aplicació».\n\nUn cop oberta la primera vegada, també funciona sense connexió.\n\nSi canvies de mòbil o necessites més dispositius, escriu-me per aquí i t\u2019ho arreglo. Qualsevol dubte o suggeriment, digues!\n\nPhotoTools+ és un projecte personal i gratuït. Si et resulta útil i vols donar-hi suport, dins de l\u2019app hi ha un botó per convidar-me a un cafè ☕. És totalment opcional.'},
+en:function(l,m){return 'Here\u2019s your personal access to PhotoTools+ 📸🌙\n\n👉 '+l+'\n\nThis link is just for you, so please don\u2019t share it. It works on up to '+m+' devices.\n\nTo use it like an app:\n• iPhone: open it in Safari → Share → \u201cAdd to Home Screen\u201d.\n• Android: open it in Chrome → menu ⋮ → \u201cInstall app\u201d.\n\nOnce opened the first time, it also works offline.\n\nIf you change phones or need more devices, message me here and I\u2019ll sort it out. Any questions or suggestions, just let me know!\n\nPhotoTools+ is a free personal project. If you find it useful and want to support it, there\u2019s a button inside the app to buy me a coffee ☕. Totally optional.'}
+};
+function lang(){return $('lang').value}
+function mensaje(a){return MSG[lang()](link(a.clave),a.max)}
+function fecha(s){try{return new Date(s).toLocaleString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){return s}}
+function copy(txt,btn,cb){
+  var done=function(){var o=btn.textContent;btn.textContent='¡Copiado!';setTimeout(function(){btn.textContent=o;if(cb)cb()},cb?1300:1500)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(done,function(){fb()});else fb();
+  function fb(){var t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(t)}
+}
+var ONLINE=5*60e3;
+function nowMs(){return Date.now()+skew}
+function ago(ts){if(!ts)return 'nunca';var d=nowMs()-Date.parse(ts);if(d<0)d=0;var m=Math.floor(d/6e4);if(m<1)return 'ahora mismo';if(m<60)return 'hace '+m+' min';var h=Math.floor(m/60);if(h<24)return 'hace '+h+' h';var dd=Math.floor(h/24);if(dd<30)return 'hace '+dd+(dd==1?' día':' días');return 'hace '+Math.floor(dd/30)+' mes'+(Math.floor(dd/30)==1?'':'es')}
+function isOn(a){return a.ultimo&&nowMs()-Date.parse(a.ultimo)<ONLINE}
+function isRec(a){return a.ultimo&&nowMs()-Date.parse(a.ultimo)<7*864e5}
+function plat(u){u=u||'';return /iPad/.test(u)?'iPad':/iPhone/.test(u)?'iPhone':/Android/.test(u)?'Android':/Macintosh/.test(u)?'Mac':/Windows/.test(u)?'Windows':/Linux/.test(u)?'Linux':'Otro'}
+function load(silent){
+  return Promise.all([rpc('admin_listar',{p_pass:pass}),rpc('admin_stats',{p_pass:pass}),rpc('admin_apoyos',{p_pass:pass}).catch(function(){return null})]).then(function(rs){
+    var r=rs[0];
+    if(!r.ok){logout();$('eLogin').textContent='Contraseña incorrecta (o demasiados intentos, espera unos minutos).';var bx=$('fLogin');bx.classList.remove('shake');void bx.offsetWidth;bx.classList.add('shake');$('pw').focus();return}
+    skew=r.ahora?Date.parse(r.ahora)-Date.now():0;data=r.accesos||[];IGT=+r.ig_total||0;igCalc();ST=rs[1]&&rs[1].ok?rs[1]:null;AP=rs[2]&&rs[2].ok?rs[2]:null;lastOk=Date.now();
+    renderStats();render();renderAp();renderIg();tick();igAuto();
+  }).catch(function(){if(!silent)$('eApp').textContent='Error de conexión.';$('upd').textContent='Sin conexión · reintentando…'});
+}
+var AP=null;
+function eur(n){return (+n).toFixed(2).replace('.',',')+' €'}
+function fdate(s){if(!s)return '—';var p=String(s).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s}
+function pidOf(name){var n=String(name||'').trim().toLowerCase();if(!n)return null;var m=data.filter(function(a){return a.nombre.trim().toLowerCase()===n});return m.length===1?m[0].id:(m.length>1?false:null)}
+function renderAp(){
+  var b=$('apBox');if(!AP){b.classList.add('hide');return}
+  b.classList.remove('hide');
+  var pg=AP.pagos||[],tot=pg.reduce(function(s,p){return s+ +p.importe},0),pend=pg.filter(function(p){return !p.acceso_id});
+  $('apSum').textContent=pg.length+' apoyo'+(pg.length==1?'':'s')+' · '+eur(tot)+(pend.length?' · '+pend.length+' por vincular':' · todos vinculados');
+  $('apHint').textContent=pend.length?'Escribe el nombre de la persona del panel en cada apoyo para vincularlo: desaparece de esta lista y pasa a su ficha (con ⭐).':'No hay apoyos por vincular. Los ya vinculados se ven en la ficha de cada persona.';
+  $('apDL').innerHTML=data.slice().sort(function(a,b){return a.nombre.localeCompare(b.nombre)}).map(function(a){return '<option value="'+esc(a.nombre)+'">'}).join('');
+  $('apList').innerHTML=pend.map(function(p){
+    return '<div class="apr"><span class="apn"><b style="color:var(--tx)">'+esc(p.pagador)+'</b><br><span class="m">'+fdate(p.fecha)+' · '+eur(p.importe)+'</span></span>'
+     +'<span style="display:flex;gap:6px"><button class="ghost" type="button" data-apedit="'+p.id+'" aria-label="Editar importe">✏️</button><button class="ghost warn" type="button" data-apdel="'+p.id+'" aria-label="Borrar apoyo">✕</button></span>'
+     +'<input type="text" class="aps" list="apDL" data-ap="'+p.id+'" placeholder="Vincular a… (escribe el nombre)" aria-label="Persona a vincular" autocapitalize="off" autocorrect="off" spellcheck="false"></div>';
+  }).join('');
+}
+function apEdit(pid){
+  var p=(AP&&AP.pagos||[]).filter(function(q){return q.id===pid})[0];if(!p)return;
+  var v=prompt('Importe del apoyo de «'+p.pagador+'» (€):',String(+p.importe).replace('.',','));if(v===null)return;
+  var n=parseFloat(String(v).replace(',','.'));if(!(n>0)||n>100000){alert('Importe no válido.');return}
+  if(n===+p.importe)return;
+  rpc('admin_apoyo_editar',{p_pass:pass,p_id:pid,p_importe:n}).then(function(r){if(!r.ok)throw 0;return load()}).catch(function(){alert('No se pudo cambiar el importe. ¿Has ejecutado el SQL «anadir_editar_apoyo.sql» en Supabase?')});
+}
+function apFicha(a){
+  var pp=(AP&&AP.pagos||[]).filter(function(p){return p.acceso_id===a.id});if(!pp.length)return '';
+  var t=pp.reduce(function(s,p){return s+ +p.importe},0);
+  return '<div class="mu" style="margin:6px 0 2px;font-size:12.5px"><b style="color:var(--tx)">Apoyos: '+eur(t)+'</b>'+pp.map(function(p){return '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:4px"><span>'+fdate(p.fecha)+' · '+eur(p.importe)+' · «'+esc(p.pagador)+'»</span><span style="display:flex;gap:6px;flex:none"><button class="ghost" type="button" data-a="apedit" data-p="'+p.id+'" style="padding:3px 9px;font-size:12px">✏️ Importe</button><button class="ghost" type="button" data-a="apdesv" data-p="'+p.id+'" style="padding:3px 9px;font-size:12px">Desvincular</button></span></div>'}).join('')+'</div>';
+}
+function tick(){var e=$('upd');if(!e||!lastOk)return;var s=Math.round((Date.now()-lastOk)/1000);e.textContent='Actualizado '+(s<5?'ahora':'hace '+s+' s')+' · se refresca solo'}
+function renderStats(){
+  if(!ST){$('stats').innerHTML='';return}
+  var on=data.filter(isOn),pc=function(n,t){return t?Math.round(100*n/t)+' %':'—'};
+  var cards=[
+    ['live',on.length,'En línea ahora','activos en los últimos 5 min'],
+    ['',ST.hoy,'Activos hoy',pc(ST.hoy,ST.activas)+' de los activos'],
+    ['',ST.siete,'Activos 7 días',pc(ST.siete,ST.activas)+' de los activos'],
+    ['',ST.personas,'Personas',ST.activas+' activas · '+(ST.personas-ST.activas)+' anuladas'],
+    ['',ST.dispositivos,'Dispositivos',(ST.personas?(ST.dispositivos/ST.personas).toFixed(1):0)+' por persona'],
+    ['',ST.aperturas,'Aperturas','veces que se ha abierto'],
+    ['',ST.nuevas7,'Nuevas 7 días','altas recientes'],
+    ['',ST.sin_entrar,'Sin entrar aún','tienen enlace pero no lo usaron']
+  ];
+  if(AP){var pg=AP.pagos||[],tot=pg.reduce(function(x,q){return x+ +q.importe},0),nap=data.filter(function(a){return a.apoyo}).length,nvip=data.filter(function(a){return a.vip}).length;
+    cards.push(['sup',eur(tot),'⭐ Apoyos recibidos',pg.length+' apoyo'+(pg.length==1?'':'s')+(pg.length?' · media '+eur(tot/pg.length):'')],
+               ['sup',data.filter(function(a){return a.apoyo||a.vip}).length,'Con acceso premium','⭐ '+nap+' apoyan · 💎 '+nvip+' VIP']);}
+  $('stats').innerHTML=cards.map(function(c){return '<div class="st '+c[0]+'"><div class="v">'+c[1]+'</div><div class="l">'+c[2]+'</div><div class="s">'+c[3]+'</div></div>'}).join('');
+  var nb=$('nowBox');
+  if(on.length){nb.classList.remove('hide');nb.innerHTML='<div class="t">● Conectados ahora ('+on.length+')</div>'+on.sort(function(a,b){return Date.parse(b.ultimo)-Date.parse(a.ultimo)}).map(function(a){return '<span class="chip" data-nm="'+esc(a.nombre)+'"><span class="od on"></span>'+esc(a.nombre)+' <small>'+ago(a.ultimo)+'</small></span>'}).join('')}
+  else{nb.classList.add('hide');nb.innerHTML=''}
+  chart();
+}
+function chart(){
+  var sr=(ST&&ST.serie)||[];if(!sr.length){$('chart').innerHTML='';return}
+  var W=640,H=150,pl=26,pb=22,pt=8,n=sr.length,bw=(W-pl)/n,mx=Math.max(4,Math.max.apply(null,sr.map(function(x){return x.aperturas})));
+  var sc=function(v){return (H-pb-pt)*v/mx},tot=0,o='';
+  for(var g=0;g<=2;g++){var v=Math.round(mx*g/2),y=H-pb-sc(v);o+='<line x1="'+pl+'" x2="'+W+'" y1="'+y+'" y2="'+y+'" stroke="#262633" stroke-width="1"/><text x="'+(pl-5)+'" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="#9b9bb0">'+v+'</text>'}
+  sr.forEach(function(x,i){tot+=x.aperturas;var h=sc(x.aperturas),hp=sc(Math.min(x.personas,mx)),X=pl+i*bw,d=String(x.dia).slice(5,10).split('-');
+    o+='<g><title>'+d[1]+'/'+d[0]+': '+x.aperturas+' aperturas · '+x.personas+' personas</title><rect x="'+(X+bw*.15)+'" y="'+(H-pb-h)+'" width="'+(bw*.7)+'" height="'+Math.max(h,x.aperturas?2:0)+'" rx="3" fill="#e8a24a"/>'
+      +'<rect x="'+(X+bw*.15)+'" y="'+(H-pb-hp)+'" width="'+(bw*.7)+'" height="'+Math.max(hp,x.personas?2:0)+'" rx="3" fill="#8fb4ff" opacity=".9"/>'
+      +((i%2===(n-1)%2)?'<text x="'+(X+bw/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="9.5" fill="#9b9bb0">'+d[1]+'/'+d[0]+'</text>':'')+'</g>'});
+  $('chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Actividad de los últimos 14 días">'+o+'</svg>';$('chSum').textContent=tot+' aperturas';
+}
+function render(){
+  var q=($('q').value||'').toLowerCase().trim(),srt=$('sort').value;
+  var F={all:function(){return true},on:isOn,rec:isRec,old:function(a){return a.activa&&a.ultimo&&!isRec(a)},nev:function(a){return !a.ultimo},off:function(a){return !a.activa},ap:function(a){return !!a.apoyo},vip:function(a){return !!a.vip},nsg:function(a){return igSt(a)==='no'},sinu:function(a){return igSt(a)==='na'}};
+  var names={all:'Todos',on:'En línea',rec:'Activos 7 d',old:'Inactivos',nev:'Sin entrar',off:'Anulados',ap:'⭐ Apoyan',vip:'💎 VIP',nsg:'✗ No me siguen',sinu:'? Sin usuario'};
+  $('flt').innerHTML=Object.keys(names).filter(function(k){return IGD||(k!=='nsg'&&k!=='sinu')}).map(function(k){var c=data.filter(F[k]).length;return '<span class="chip'+(filt===k?' sel':'')+'" data-f="'+k+'">'+names[k]+' <small>'+c+'</small></span>'}).join('');
+  var rows=data.filter(function(a){return F[filt](a)&&(!q||a.nombre.toLowerCase().indexOf(q)>=0)});
+  var U=function(a){return a.ultimo?Date.parse(a.ultimo):0};
+  rows.sort(srt==='nom'?function(a,b){return a.nombre.localeCompare(b.nombre)}:srt==='ape'?function(a,b){return b.aperturas-a.aperturas}:srt==='new'?function(a,b){return Date.parse(b.creado)-Date.parse(a.creado)}:srt==='dev'?function(a,b){return b.dispositivos.length-a.dispositivos.length}:function(a,b){return U(b)-U(a)});
+  $('cnt').textContent=rows.length+(rows.length==data.length?'':' de '+data.length)+' persona'+(rows.length==1?'':'s');
+  $('list').innerHTML=rows.map(function(a){
+    var n=a.dispositivos.length,on=isOn(a);
+    return '<div class="card'+(open_[a.id]?'':' c')+'" data-id="'+a.id+'"><div class="p" data-a="tog"><span class="name"><span class="od '+(on?'on':isRec(a)?'rec':'')+'"></span> '+(a.apoyo?'⭐ ':'')+(a.vip?'💎 ':'')+esc(a.nombre)+igBadge(a)+'<span class="chev">▶</span></span><span><span class="pill '+(a.activa?'on':'off')+'">'+(a.activa?'activo':'anulado')+'</span> <span class="pill">'+n+' / '+a.max+' disp.</span> <span class="pill ap">'+a.aperturas+' aperturas</span>'+(a.apoyo?' <span class="pill sup">⭐ Apoya</span>':'')+(a.vip?' <span class="pill vip">💎 VIP</span>':'')+'</span></div>'
+     +'<div class="ago" style="margin-top:4px">'+(on?'<span style="color:var(--ok)">● En línea</span>':a.ultimo?'Visto '+ago(a.ultimo):'Aún no ha entrado')+' · alta '+ago(a.creado)+'</div>'
+     +'<div class="det"><div class="mu" style="margin-top:8px">Enlace: …?k='+esc(a.clave)+'</div>'
+     +'<div class="sup-box"><div><b>⭐ Apoya el proyecto</b><div class="mu">Da acceso a las herramientas de apoyo (Red Sprites…)</div></div><button class="sw'+(a.apoyo?' on':'')+'" data-a="apoyo" role="switch" aria-checked="'+(!!a.apoyo)+'" aria-label="Apoya el proyecto"></button></div>'
+     +'<div class="sup-box vb"><div><b>💎 VIP (invitado)</b><div class="mu">Acceso a las herramientas de apoyo sin haber aportado</div></div><button class="sw'+(a.vip?' on':'')+'" data-a="vip" role="switch" aria-checked="'+(!!a.vip)+'" aria-label="VIP"></button></div>'
+     +apFicha(a)+igFicha(a)
+     +a.dispositivos.map(function(d){return '<div class="dev"><span><b style="color:var(--tx)">'+esc(disp(d.agente))+'</b><br>Primero: '+fecha(d.primer)+' · Último: '+fecha(d.ultimo)+' ('+ago(d.ultimo)+') · '+(d.aperturas||0)+' aperturas</span><button class="ghost warn" data-a="quitar" data-d="'+d.id+'">Quitar</button></div>'}).join('')
+     +'<div class="acts"><button class="ghost" data-a="ren">✏️ Editar nombre</button><button class="ghost" data-a="copiar">Copiar enlace</button><button class="ghost" data-a="msg">Copiar mensaje</button><button class="ghost" data-a="limite">Cambiar límite</button>'
+     +(n?'<button class="ghost" data-a="liberar">Liberar dispositivos</button>':'')
+     +'<button class="ghost" data-a="'+(a.activa?'anular':'activar')+'">'+(a.activa?'Anular':'Reactivar')+'</button><button class="ghost warn" data-a="borrar">Borrar</button></div></div></div>';
+  }).join('')||'<p class="mu">Sin resultados.</p>';
+}
+function act(accion,id,valor){return rpc('admin_accion',{p_pass:pass,p_id:id,p_accion:accion,p_valor:valor==null?null:valor}).then(function(r){if(!r.ok)throw 0;return load()}).catch(function(){$('eApp').textContent='No se pudo realizar la acción.'})}
+$('list').onclick=function(e){
+  var t=e.target.closest('.p');if(t&&!e.target.closest('button')){var c=t.closest('.card'),i=c.dataset.id;open_[i]=!open_[i];c.classList.toggle('c',!open_[i]);return}
+  var b=e.target.closest('button');if(!b)return;
+  var card=b.closest('.card'),id=card.dataset.id,a=data.filter(function(x){return x.id===id})[0],ac=b.dataset.a;$('eApp').textContent='';
+  if(ac==='copiar')copy(link(a.clave),b);
+  else if(ac==='msg')copy(mensaje(a),b);
+  else if(ac==='quitar'){if(confirm('¿Quitar este dispositivo? Esa persona podrá registrar uno nuevo.'))rpc('admin_quitar_dispositivo',{p_pass:pass,p_id:b.dataset.d}).then(load)}
+  else if(ac==='limite'){var v=prompt('Máximo de dispositivos para '+a.nombre+':',a.max);if(v&&+v>0)act('limite',id,Math.round(+v))}
+  else if(ac==='liberar'){if(confirm('¿Borrar todos los dispositivos de '+a.nombre+'? Empezará de cero con el mismo enlace.'))act('liberar',id)}
+  else if(ac==='anular'){if(confirm('¿Anular el enlace de '+a.nombre+'? Dejará de poder entrar.'))act('anular',id)}
+  else if(ac==='activar')act('activar',id);
+  else if(ac==='apoyo')act(a.apoyo?'apoyo_off':'apoyo_on',id);
+  else if(ac==='vip')act(a.vip?'vip_off':'vip_on',id);
+  else if(ac==='apedit')apEdit(b.dataset.p);
+  else if(ac==='apdesv')rpc('admin_apoyo_vincular',{p_pass:pass,p_id:b.dataset.p,p_acceso:null}).then(function(r){if(!r.ok)throw 0;return load()}).catch(function(){$('eApp').textContent='No se pudo desvincular.'});
+  else if(ac==='ren'){var nn=prompt('Nombre o usuario de Instagram:',a.nombre);if(nn!==null){nn=nn.trim();if(nn&&nn!==a.nombre)rpc('admin_renombrar',{p_pass:pass,p_id:id,p_nombre:nn}).then(function(r){if(!r.ok)throw 0;return IGD?igUser(a,a.ig_usuario||null,nn):load()}).catch(function(){$('eApp').textContent='No se pudo cambiar el nombre. Si es la primera vez, falta ejecutar el SQL «anadir_editar_nombre.sql» en Supabase.'})}}
+  else if(ac==='igset'){var v=prompt('Usuario de Instagram de '+a.nombre+' (sin @). Escribe - si no tiene Instagram. Vacío = quitarlo:',a.ig_usuario||(handleOf(a)||{}).h||'');if(v!==null){igUser(a,v.trim().replace(/^@/,'').toLowerCase())}}
+  else if(ac==='borrar'){if(confirm('¿Borrar a '+a.nombre+' definitivamente?'))act('borrar',id)}
+};
+$('apList').onchange=function(e){var inp=e.target.closest('input[data-ap]');if(!inp)return;var v=inp.value.trim();if(!v)return;
+  var id=pidOf(v);if(!id){$('eApp').textContent=id===false?'Hay varias personas con ese nombre; escribe el nombre exacto.':'No encuentro a nadie con ese nombre en el panel.';inp.value='';return}
+  $('eApp').textContent='';rpc('admin_apoyo_vincular',{p_pass:pass,p_id:inp.dataset.ap,p_acceso:id}).then(function(r){if(!r.ok)throw 0;return load()}).catch(function(){$('eApp').textContent='No se pudo vincular.'})};
+$('apList').onclick=function(e){var be=e.target.closest('button[data-apedit]');if(be){apEdit(be.dataset.apedit);return}var b=e.target.closest('button[data-apdel]');if(!b)return;
+  if(confirm('¿Borrar este apoyo del registro? (No cambia el acceso de ninguna persona.)'))rpc('admin_apoyo_borrar',{p_pass:pass,p_id:b.dataset.apdel}).then(load)};
+$('fAp').onsubmit=function(e){e.preventDefault();var n=$('apN').value.trim(),i=parseFloat(String($('apI').value).replace(',','.'));if(!n||!(i>0))return;
+  var pn=$('apP').value.trim(),id=pn?pidOf(pn):null;if(pn&&!id){$('eApp').textContent=id===false?'Hay varias personas con ese nombre; escribe el nombre exacto.':'No encuentro a nadie con ese nombre en el panel.';return}
+  $('eApp').textContent='';rpc('admin_apoyo_add',{p_pass:pass,p_pagador:n,p_importe:i,p_fecha:$('apF').value||null,p_acceso:id||null}).then(function(r){if(!r.ok)throw 0;$('apN').value='';$('apI').value='';$('apF').value='';$('apP').value='';return load()}).catch(function(){$('eApp').textContent='No se pudo añadir el apoyo.'})};
+
+var IGD=null,IGL=null,IGT=0,igAutoDone=false;
+try{var _g=JSON.parse(localStorage.getItem('adm_ig')||'null');if(_g&&_g.f)IGL={d:_g.d,s:new Set(_g.f)}}catch(e){IGL=null}
+function igCalc(){var m=0;data.forEach(function(a){if(a.ig_estado&&a.ig_check){var t=Date.parse(a.ig_check);if(t>m)m=t}});IGD=m?{d:m}:null}
+function igLocal(){return IGL&&IGD&&IGL.d>=IGD.d?IGL:null}
+function handleOf(a){
+  var u=a.ig_usuario;
+  if(u==='-')return null;
+  if(u)return {h:u,sure:true};
+  var n=String(a.nombre||'').trim(),m=n.match(/instagram\.com\/(?:_u\/)?([A-Za-z0-9._]+)/i)||n.match(/(?:^|[\s(])@([A-Za-z0-9._]{1,30})/);
+  if(m)return {h:m[1].replace(/\.+$/,'').toLowerCase(),sure:true};
+  if(/^[A-Za-z0-9._]{2,30}$/.test(n)&&!/@/.test(n))return {h:n.toLowerCase(),sure:false};
+  return null;
+}
+function igCalcOne(a,set){
+  if(a.ig_usuario==='-')return 'none';
+  var h=handleOf(a);if(!h)return 'na';
+  if(set.has(h.h))return 'ok';
+  return h.sure?'no':'na';
+}
+function igSt(a){if(!IGD)return null;var e=a.ig_estado;return (!e||e==='pend')?'new':e}
+function igBadge(a){var t=igSt(a);if(!t)return '';return '<span class="igb '+t+'" title="Instagram">'+(t==='ok'?'✓ sigue':t==='no'?'✗ no sigue':t==='none'?'— sin IG':t==='new'?'⏳ pendiente':'? sin @')+'</span>'}
+function igFicha(a){
+  if(!IGD)return '';var h=handleOf(a),t=igSt(a);
+  return '<div class="sup-box"><div><b>📸 Instagram</b><div class="mu">'+(t==='none'?'Marcado como sin Instagram':t==='new'?(h?'@'+esc(h.h):'Sin usuario')+' · pendiente de comprobar con la próxima lista':h?'@'+esc(h.h)+(h.sure?'':' (supuesto por el nombre)'):'No hay usuario guardado')+(t==='ok'?' · te sigue':t==='no'?' · no te sigue':'')+'</div></div><button class="ghost" data-a="igset" type="button">'+(h||t==='none'?'Cambiar @':'Poner @')+'</button></div>';
+}
+var IGSQL='Falta ejecutar el SQL «anadir_seguidores_instagram.sql» en Supabase.';
+function igFail(){$('igErr').textContent=IGSQL;$('igBox').open=true}
+function igSave(set,total,when){
+  var rows=data.map(function(a){return {id:a.id,estado:igCalcOne(a,set)}});
+  return rpc('admin_ig_guardar',{p_pass:pass,p_datos:rows,p_total:total,p_check:new Date(when).toISOString()}).then(function(r){if(!r.ok)throw 0;return load()});
+}
+function igUser(a,v,nombre){
+  var L=igLocal(),obj={nombre:nombre||a.nombre,ig_usuario:v||null},est=L?igCalcOne(obj,L.s):'pend';
+  return rpc('admin_ig_usuario',{p_pass:pass,p_id:a.id,p_usuario:v||null,p_estado:est,p_check:L?new Date(L.d).toISOString():null}).then(function(r){if(!r.ok)throw 0;return load()}).catch(igFail);
+}
+function igAuto(){
+  /* Una sola vez: sube a la base de datos lo que ya tenías en este navegador (lista y correcciones). */
+  if(igAutoDone||IGD||!IGL||!data.length)return;igAutoDone=true;
+  var map={};try{map=JSON.parse(localStorage.getItem('adm_igmap')||'{}')||{}}catch(e){}
+  var ids=Object.keys(map).filter(function(id){return data.some(function(a){return a.id===id})});
+  ids.forEach(function(id){data.filter(function(a){return a.id===id})[0].ig_usuario=map[id]});
+  var chain=Promise.resolve();
+  ids.forEach(function(id){chain=chain.then(function(){return rpc('admin_ig_usuario',{p_pass:pass,p_id:id,p_usuario:map[id],p_estado:'pend',p_check:null})})});
+  chain.then(function(){return igSave(IGL.s,IGL.s.size,IGL.d)}).then(function(){try{localStorage.removeItem('adm_igmap')}catch(e){}}).catch(function(){});
+}
+function igParse(txt,name){
+  var out=[],t=String(txt).replace(/^﻿/,'');
+  if(/^\s*[\[{]/.test(t)){
+    var o=JSON.parse(t);
+    (function walk(x){
+      if(!x||typeof x!=='object')return;
+      if(Array.isArray(x)){x.forEach(walk);return}
+      if(Array.isArray(x.string_list_data)){x.string_list_data.forEach(function(e){
+        var v=e&&(e.value||(e.href?String(e.href).replace(/\/+$/,'').split('/').pop():''))||'';
+        if(!v&&x.title)v=x.title;if(v)out.push(v)});return}
+      Object.keys(x).forEach(function(k){walk(x[k])});
+    })(o);
+  }else{
+    var re=/instagram\.com\/(?:_u\/)?([A-Za-z0-9._]+)/gi,m;while((m=re.exec(t)))out.push(m[1]);
+  }
+  return out.map(function(v){return String(v).trim().replace(/^@/,'').toLowerCase()}).filter(function(v){return /^[a-z0-9._]{1,30}$/.test(v)});
+}
+function igRemind(){
+  var b=$('igRem');if(!b)return;
+  var days=IGD?Math.floor((Date.now()-IGD.d)/864e5):null;
+  if(IGD&&days<7){b.classList.add('hide');return}
+  b.classList.remove('hide');
+  b.innerHTML=IGD?'📸 <b>Toca comprobar seguidores</b> · la última lista es de hace '+days+' días. Descarga una nueva de Instagram y súbela aquí (una vez por semana).':'📸 <b>Aún no has comprobado seguidores.</b> Descarga tu lista de Instagram y súbela aquí; repítelo una vez por semana.';
+}
+function renderIg(){
+  var sm=$('igSum'),r=$('igRes');if(!sm)return;
+  igRemind();
+  if(!IGD){sm.textContent='Sin comprobar';r.innerHTML='';return}
+  var c={ok:0,no:0,na:0,none:0,new:0},no=[];data.forEach(function(a){var t=igSt(a);c[t]++;if(t==='no')no.push(a)});
+  var days=Math.floor((Date.now()-IGD.d)/864e5),old=days>=7;
+  sm.textContent='✓ '+c.ok+' · ✗ '+c.no+' · ? '+c.na+(c.new?' · ⏳ '+c.new:'');
+  r.innerHTML='<div class="mu" style="font-size:12.5px">Lista'+(IGT?' de '+IGT+' seguidores':'')+' cargada el '+new Date(IGD.d).toLocaleDateString('es-ES')+' ('+(days<1?'hoy':'hace '+days+(days==1?' día':' días'))+'). Se ve igual desde cualquier dispositivo.</div>'
+   +(old?'<div class="igw">Esta lista tiene más de una semana. Descarga una nueva de Instagram para que la comprobación sea fiable.</div>':'')
+   +(no.length?'<div style="margin-top:10px"><b style="font-size:13px">✗ No te siguen ('+no.length+')</b><div class="chips" style="margin-top:6px">'+no.sort(function(a,b){return (b.apoyo||b.vip?1:0)-(a.apoyo||a.vip?1:0)}).map(function(a){return '<span class="chip" data-nm="'+esc(a.nombre)+'">'+(a.apoyo?'⭐ ':'')+(a.vip?'💎 ':'')+esc(a.nombre)+'</span>'}).join('')+'</div><div class="mu" style="font-size:12px">Es solo un aviso: no se anula ningún acceso automáticamente.</div></div>':'<div style="margin-top:10px;color:var(--ok)">✓ Todos los que tienen usuario te siguen.</div>')
+   +(c.new?'<div class="mu" style="font-size:12.5px;margin-top:8px">⏳ '+c.new+' persona'+(c.new==1?'':'s')+' pendiente'+(c.new==1?'':'s')+' de comprobar (alta o cambio posterior a la lista): se comprobará'+(c.new==1?'':'n')+' con la próxima.</div>':'')
+   +(c.na?'<div class="mu" style="font-size:12.5px;margin-top:8px">'+c.na+' persona'+(c.na==1?'':'s')+' sin usuario de Instagram reconocible. Filtra por «? Sin usuario» y pon su @ en la ficha, o márcala como «sin Instagram».</div>':'');
+}
+$('igRem').onclick=function(){var d=$('igBox');d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})};
+$('igFile').onchange=function(){
+  var fs=[].slice.call(this.files||[]),inp=this,er=$('igErr');er.textContent='';if(!fs.length)return;
+  var fol=fs.filter(function(f){return /follower/i.test(f.name)}),ign=0;
+  if(fol.length){ign=fs.length-fol.length;fs=fol}
+  else if(fs.some(function(f){return /following/i.test(f.name)})){er.textContent='Ese archivo parece de «seguidos» (following). Necesito el de «seguidores» (followers_1.json).';inp.value='';return}
+  Promise.all(fs.map(function(f){return new Promise(function(ok,ko){var r=new FileReader();r.onload=function(){try{ok(igParse(r.result,f.name))}catch(e){ko(e)}};r.onerror=ko;r.readAsText(f)})})).then(function(parts){
+    var all=[].concat.apply([],parts);
+    if(all.length<2){er.textContent='No encuentro usuarios en ese archivo. Comprueba que sea el de seguidores en formato JSON.';return}
+    IGL={d:Date.now(),s:new Set(all)};
+    try{localStorage.setItem('adm_ig',JSON.stringify({d:IGL.d,f:Array.from(IGL.s)}))}catch(e){}
+    er.textContent='Guardando…';
+    return igSave(IGL.s,IGL.s.size,IGL.d).then(function(){$('igBox').open=true;er.textContent=ign?'Ignorados '+ign+' archivo'+(ign==1?'':'s')+' que no eran de seguidores. Cargados '+fs.length+'.':''}).catch(igFail);
+  }).catch(function(){er.textContent='No he podido leer el archivo.'}).then(function(){inp.value=''});
+};
+$('q').oninput=function(){$('qx').classList.toggle('on',!!this.value);render()};
+$('qx').onclick=function(){var q=$('q');q.value='';this.classList.remove('on');render();q.focus()};$('sort').onchange=render;
+$('flt').onclick=function(e){var c=e.target.closest('[data-f]');if(c){filt=c.dataset.f;render()}};
+$('nowBox').onclick=function(e){var c=e.target.closest('[data-nm]');if(c){$('q').value=c.dataset.nm;$('qx').classList.add('on');filt='all';render();$('q').scrollIntoView({behavior:'smooth',block:'center'})}};
+$('bRef').onclick=function(){load()};
+try{var sl=localStorage.getItem('adm_lang');if(sl&&MSG[sl])$('lang').value=sl}catch(e){}
+$('lang').onchange=function(){try{localStorage.setItem('adm_lang',this.value)}catch(e){}};
+$('fNew').onsubmit=function(e){
+  e.preventDefault();var n=$('nom').value.trim();if(!n)return;$('eApp').textContent='';
+  rpc('admin_crear',{p_pass:pass,p_nombre:n,p_max:parseInt($('max').value,10)||4}).then(function(r){
+    if(!r.ok)throw 0;
+    var a={clave:r.clave,max:parseInt($('max').value,10)||4},box=$('nuevo');
+    var clear=function(){box.className='hide';box.innerHTML=''};
+    box.className='';box.innerHTML='<div class="res"><div class="t">✓ Enlace creado para '+esc(r.nombre||n)+'</div><div class="lnk">'+esc(link(a.clave))+'</div><div class="acts"><button class="btn" id="c1" type="button">Copiar enlace</button><button class="ghost" id="c2" type="button">Copiar mensaje</button><button class="ghost" id="c3" type="button">Limpiar</button></div><div class="mu" style="margin-top:8px;font-size:12px">Al copiar, esta tarjeta se limpia sola.</div></div>';
+    $('c1').onclick=function(){copy(link(a.clave),this,clear)};$('c2').onclick=function(){copy(mensaje(a),this,clear)};$('c3').onclick=clear;
+    $('nom').value='';load();
+  }).catch(function(){$('eApp').textContent='No se pudo crear.'});
+};
+function logout(){pass='';ST=null;data=[];document.body.classList.add('in');$('topbar').style.display='none';try{sessionStorage.removeItem('adm')}catch(e){}$('app').classList.add('hide');$('login').classList.remove('hide');$('bOut').classList.add('hide');busy(false)}
+function busy(b){var g=$('bGo');if(!g)return;g.disabled=b;$('goT').textContent=b?'Comprobando…':'Entrar';var o=g.querySelector('.sp');if(b&&!o){var sp=document.createElement('span');sp.className='sp';g.insertBefore(sp,g.firstChild)}else if(!b&&o)o.remove()}
+function enter(p){pass=p;$('eLogin').textContent='';busy(true);load().then(function(){if(pass){if(!tmr){tmr=setInterval(function(){if(pass&&!document.hidden)load(true)},30000);setInterval(tick,5000)}document.body.classList.remove('in');$('topbar').style.display='';$('login').classList.add('hide');$('app').classList.remove('hide');$('bOut').classList.remove('hide');try{sessionStorage.setItem('adm',pass)}catch(e){}}})}
+$('fLogin').onsubmit=function(e){e.preventDefault();var v=$('pw').value;$('pw').value='';if(v)enter(v)};
+$('bOut').onclick=logout;
+$('topbar').style.display='none';
+$('eye').onclick=function(){var i=$('pw'),sh=i.type==='password';i.type=sh?'text':'password';this.style.color=sh?'var(--ac2)':'';this.setAttribute('aria-label',sh?'Ocultar contraseña':'Mostrar contraseña')};
+document.body.classList.add('in');
+try{var s=sessionStorage.getItem('adm');if(s)enter(s)}catch(e){}
+})();
+</script></body></html>

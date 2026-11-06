@@ -1,0 +1,7 @@
+/p/adsblol/*        https://api.adsb.lol/:splat          200
+/p/airplaneslive/*  https://api.airplanes.live/:splat    200
+/p/adsbfi/*         https://opendata.adsb.fi/:splat      200
+/p/opensky/*        https://opensky-network.org/:splat   200
+/p/celestrak/* https://celestrak.org/:splat 200
+/p/wheretheiss/* https://api.wheretheiss.at/:splat 200
+/p/tleapi/* https://tle.ivanstanojevic.me/:splat 200

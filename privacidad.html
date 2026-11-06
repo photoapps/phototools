@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0b0b10">
+<title>Privacidad · PhotoTools+</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{--bg:#0b0b10;--card:#15151d;--ln:#262633;--tx:#ecebf2;--mu:#9b9bb0;--ac:#e8a24a;--ac2:#f6c477;--rd:#e5604f}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(56px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.3px;color:var(--tx);text-decoration:none}.logo b{color:var(--ac)}
+.lang{display:flex;gap:6px}.lang button{background:none;border:1px solid var(--ln);color:var(--mu);border-radius:999px;padding:5px 11px;font:600 12px system-ui;cursor:pointer}
+.lang button.on{background:var(--ac);color:#1a1206;border-color:var(--ac)}
+h1{font-size:clamp(22px,5vw,28px);line-height:1.15;margin:22px 0 4px;letter-spacing:-.5px}
+h2{font-size:15px;margin:24px 0 4px;color:var(--ac2)}
+p,li{color:var(--tx)}
+.mu{color:var(--mu);font-size:12.5px}
+ul{padding-left:20px;margin:6px 0}li{margin:4px 0}
+a{color:var(--ac2)}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:18px;margin-top:14px}
+.card h2{margin-top:0}
+input{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:12px;font:14px ui-monospace,monospace;margin:8px 0}
+button.b{border:0;border-radius:999px;padding:11px 20px;font:700 14px system-ui;cursor:pointer}
+.del{background:transparent;color:var(--rd);border:1.5px solid var(--rd)}
+.go{background:var(--rd);color:#fff}
+.no{background:none;color:var(--mu);border:1px solid var(--ln)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.msg{margin-top:12px;font-size:14px}.ok{color:#6fcf97}.er{color:var(--rd)}
+.hide{display:none}
+.back{display:inline-flex;align-items:center;gap:6px;margin:6px 0 0;padding:9px 16px;border:1px solid var(--ln);border-radius:999px;color:var(--tx);text-decoration:none;font:600 13.5px system-ui;background:var(--card)}
+.back.bot{margin:26px auto 0;display:flex;width:max-content}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="logo" href="./">Photo<b>Tools+</b></a>
+    <div class="lang"><button data-l="es">ES</button><button data-l="ca">CA</button><button data-l="en">EN</button></div></div>
+  <a class="back" id="bk" href="./">← <span class="bt"></span></a>
+  <div id="doc"></div>
+  <div class="card" id="delCard">
+    <h2 id="dT"></h2>
+    <p id="dB"></p>
+    <div id="dStep1">
+      <label class="mu" id="dL" for="dK"></label>
+      <input id="dK" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="row"><button class="b del" id="dBtn"></button></div>
+    </div>
+    <div id="dStep2" class="hide">
+      <p id="dW" class="er"></p>
+      <div class="row"><button class="b go" id="dYes"></button><button class="b no" id="dNo"></button></div>
+    </div>
+    <div class="msg" id="dM"></div>
+  </div>
+  <a class="back bot" id="bk2" href="./">← <span class="bt"></span></a>
+  <p class="mu" style="text-align:center;margin-top:30px">@livetgn · © 2026 PhotoTools+</p>
+</div>
+<script>
+(function(){
+'use strict';
+var SB_URL='https://htskwweyxwlgnbeivugi.supabase.co', SB_KEY='sb_publishable__3EApIwiBv4AMbyJ-R-csQ_R7UeJ5Q5', MAIL='livetgn@gmail.com';
+var TP='Open-Meteo, MET Norway, adsb.lol, airplanes.live, adsb.fi, OpenSky Network, OpenStreetMap, Esri (ArcGIS), BigDataCloud, OSRM, Overpass API, Celestrak, wheretheiss.at, tle.ivanstanojevic.me';
+var T={
+es:{
+ t:'Política de privacidad',upd:'Última actualización: noviembre de 2026',
+ s1:'Quién es el responsable',b1:'PhotoTools+ lo gestiona <b>@livetgn</b>, a título personal y sin ánimo de lucro. Contacto: <a href="mailto:'+MAIL+'">'+MAIL+'</a> o mensaje en Instagram (<a href="https://www.instagram.com/livetgn/" target="_blank" rel="noopener">@livetgn</a>).',
+ s2:'Qué datos recopilamos',b2:'<ul><li><b>Tu acceso:</b> el nombre o @ que me diste al pedir el acceso y tu enlace personal (clave).</li><li><b>Tus dispositivos:</b> un identificador aleatorio de cada navegador o instalación, el tipo de móvil/navegador (user-agent), la fecha del primer y último uso y el número de aperturas.</li><li><b>Actividad:</b> cuántas veces abres la app cada día.</li><li><b>Instagram:</b> si me pediste acceso por Instagram, apunto tu @ y compruebo si sigues la cuenta, solo para decidir las herramientas de apoyo.</li><li><b>Apoyos:</b> si me invitas a un café, apunto el nombre y el importe para llevar la cuenta.</li><li><b>En tu dispositivo</b> (no se envía a nadie): idioma, modo noche, zoom, tu equipo y tus sesiones guardadas.</li></ul><p>No pedimos tu correo, teléfono ni dirección, ni usamos cookies de publicidad ni de seguimiento. Tu ubicación solo se usa si tú la das al usar una herramienta.</p>',
+ s3:'Para qué los usamos',b3:'Para controlar quién puede entrar con cada enlace personal, limitar los dispositivos, ver estadísticas de uso básicas y decidir el acceso a las herramientas de apoyo. No vendemos ni cedemos tus datos para publicidad.',
+ s4:'Con quién se comparten',b4:'<p><b>Servicios que guardan datos por nosotros:</b></p><ul><li><b>Supabase</b>: base de datos donde se guarda tu acceso, dispositivos y actividad.</li><li><b>Netlify</b>: alojamiento de la web; registra datos técnicos habituales como la dirección IP.</li></ul><p><b>Servicios que usa la app directamente desde tu dispositivo</b> cuando usas una herramienta (tiempo, aviones, satélites, mapas, búsqueda de lugares). Reciben la consulta, que puede incluir las coordenadas aproximadas del lugar y tu dirección IP: '+TP+'. Las consultas de aviones y satélites pasan por el servidor de Netlify, que las reenvía.</p><p>Al abrir enlaces externos (Instagram, PayPal, Windy…) se aplican sus propias políticas. Algunos de estos servicios pueden estar fuera de la Unión Europea.</p>',
+ s5:'Cuánto tiempo',b5:'Mientras tu acceso esté activo. Puedes borrarlo cuando quieras (abajo) o pedírmelo.',
+ s6:'Tus derechos',b6:'Puedes pedir acceso, rectificación o supresión de tus datos, oponerte a su uso o pedir su limitación escribiendo a <a href="mailto:'+MAIL+'">'+MAIL+'</a>. Si crees que no se tratan bien, puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).',
+ dT:'Borrar mis datos',dB:'Elimina tu acceso, tus dispositivos y tu actividad de forma inmediata. Dejarás de poder entrar con tu enlace.',dL:'Tu clave (el final de tu enlace personal):',dBtn:'Borrar mis datos',
+ dW:'Se eliminará tu acceso, tus dispositivos y tu actividad. Esto no se puede deshacer.',dYes:'Sí, borrar todo',dNo:'Cancelar',
+ mNo:'Escribe tu clave para continuar.',mOk:'Listo, tus datos se han borrado.',mBad:'No he encontrado ese acceso. Revisa la clave o escríbeme.',mNet:'No se pudo conectar. Inténtalo de nuevo o escríbeme a '+MAIL+'.'},
+ca:{
+ t:'Política de privadesa',upd:'Última actualització: novembre de 2026',
+ s1:'Qui n’és el responsable',b1:'PhotoTools+ el gestiona <b>@livetgn</b>, a títol personal i sense afany de lucre. Contacte: <a href="mailto:'+MAIL+'">'+MAIL+'</a> o missatge a Instagram (<a href="https://www.instagram.com/livetgn/" target="_blank" rel="noopener">@livetgn</a>).',
+ s2:'Quines dades recopilem',b2:'<ul><li><b>El teu accés:</b> el nom o @ que em vas donar en demanar l’accés i el teu enllaç personal (clau).</li><li><b>Els teus dispositius:</b> un identificador aleatori de cada navegador o instal·lació, el tipus de mòbil/navegador (user-agent), la data del primer i l’últim ús i el nombre d’obertures.</li><li><b>Activitat:</b> quantes vegades obres l’app cada dia.</li><li><b>Instagram:</b> si em vas demanar accés per Instagram, apunto el teu @ i comprovo si segueixes el compte, només per decidir les eines de suport.</li><li><b>Suports:</b> si em convides a un cafè, apunto el nom i l’import per portar el compte.</li><li><b>Al teu dispositiu</b> (no s’envia a ningú): idioma, mode nit, zoom, el teu equip i les sessions desades.</li></ul><p>No demanem el teu correu, telèfon ni adreça, ni fem servir galetes de publicitat ni de seguiment. La teva ubicació només s’usa si tu la dónes en fer servir una eina.</p>',
+ s3:'Per a què els fem servir',b3:'Per controlar qui pot entrar amb cada enllaç personal, limitar els dispositius, veure estadístiques d’ús bàsiques i decidir l’accés a les eines de suport. No venem ni cedim les teves dades per a publicitat.',
+ s4:'Amb qui es comparteixen',b4:'<p><b>Serveis que guarden dades per nosaltres:</b></p><ul><li><b>Supabase</b>: base de dades on es guarden el teu accés, dispositius i activitat.</li><li><b>Netlify</b>: allotjament de la web; registra dades tècniques habituals com l’adreça IP.</li></ul><p><b>Serveis que fa servir l’app directament des del teu dispositiu</b> quan uses una eina (temps, avions, satèl·lits, mapes, cerca de llocs). Reben la consulta, que pot incloure les coordenades aproximades del lloc i la teva adreça IP: '+TP+'. Les consultes d’avions i satèl·lits passen pel servidor de Netlify, que les reenvia.</p><p>En obrir enllaços externs (Instagram, PayPal, Windy…) s’apliquen les seves pròpies polítiques. Alguns d’aquests serveis poden ser fora de la Unió Europea.</p>',
+ s5:'Quant de temps',b5:'Mentre el teu accés estigui actiu. Pots esborrar-lo quan vulguis (a sota) o demanar-m’ho.',
+ s6:'Els teus drets',b6:'Pots demanar accés, rectificació o supressió de les teves dades, oposar-te al seu ús o demanar-ne la limitació escrivint a <a href="mailto:'+MAIL+'">'+MAIL+'</a>. Si creus que no es tracten bé, pots reclamar davant l’Agència Espanyola de Protecció de Dades (aepd.es).',
+ dT:'Esborrar les meves dades',dB:'Elimina el teu accés, els teus dispositius i la teva activitat de forma immediata. Deixaràs de poder entrar amb el teu enllaç.',dL:'La teva clau (el final del teu enllaç personal):',dBtn:'Esborrar les meves dades',
+ dW:'S’eliminarà el teu accés, els teus dispositius i la teva activitat. Això no es pot desfer.',dYes:'Sí, esborrar-ho tot',dNo:'Cancel·lar',
+ mNo:'Escriu la teva clau per continuar.',mOk:'Fet, les teves dades s’han esborrat.',mBad:'No he trobat aquest accés. Revisa la clau o escriu-me.',mNet:'No s’ha pogut connectar. Torna-ho a provar o escriu-me a '+MAIL+'.'},
+en:{
+ t:'Privacy policy',upd:'Last updated: November 2026',
+ s1:'Who is responsible',b1:'PhotoTools+ is run by <b>@livetgn</b> as a personal, non-profit project. Contact: <a href="mailto:'+MAIL+'">'+MAIL+'</a> or a message on Instagram (<a href="https://www.instagram.com/livetgn/" target="_blank" rel="noopener">@livetgn</a>).',
+ s2:'What data we collect',b2:'<ul><li><b>Your access:</b> the name or @ you gave me when asking for access, and your personal link (key).</li><li><b>Your devices:</b> a random ID for each browser or install, the phone/browser type (user-agent), the dates of first and last use and the number of opens.</li><li><b>Activity:</b> how many times you open the app each day.</li><li><b>Instagram:</b> if you asked for access through Instagram, I note your @ and check whether you follow the account, only to decide on the supporter tools.</li><li><b>Support:</b> if you buy me a coffee, I note the name and amount to keep track.</li><li><b>On your device</b> (sent to no one): language, night mode, zoom, your gear and saved sessions.</li></ul><p>We don’t ask for your email, phone or address, and we use no advertising or tracking cookies. Your location is only used if you provide it when using a tool.</p>',
+ s3:'What we use it for',b3:'To control who can enter with each personal link, limit devices, see basic usage statistics and decide access to the supporter tools. We don’t sell or share your data for advertising.',
+ s4:'Who it is shared with',b4:'<p><b>Services that store data for us:</b></p><ul><li><b>Supabase</b>: the database holding your access, devices and activity.</li><li><b>Netlify</b>: website hosting; it logs usual technical data such as the IP address.</li></ul><p><b>Services the app calls directly from your device</b> when you use a tool (weather, aircraft, satellites, maps, place search). They receive the request, which may include the approximate coordinates of the place and your IP address: '+TP+'. Aircraft and satellite requests go through Netlify’s server, which forwards them.</p><p>When you open external links (Instagram, PayPal, Windy…) their own policies apply. Some of these services may be outside the European Union.</p>',
+ s5:'How long',b5:'While your access is active. You can delete it any time (below) or ask me to.',
+ s6:'Your rights',b6:'You can ask for access, correction or deletion of your data, object to its use or ask for it to be restricted by writing to <a href="mailto:'+MAIL+'">'+MAIL+'</a>. If you think it is not handled properly, you can complain to the Spanish Data Protection Agency (aepd.es).',
+ dT:'Delete my data',dB:'Removes your access, your devices and your activity immediately. You will no longer be able to enter with your link.',dL:'Your key (the end of your personal link):',dBtn:'Delete my data',
+ dW:'Your access, devices and activity will be removed. This cannot be undone.',dYes:'Yes, delete everything',dNo:'Cancel',
+ mNo:'Enter your key to continue.',mOk:'Done, your data has been deleted.',mBad:'I couldn’t find that access. Check the key or message me.',mNet:'Could not connect. Try again or write to '+MAIL+'.'}
+};
+function ls(a,k,v){try{if(a==='g')return localStorage.getItem(k);if(a==='s')localStorage.setItem(k,v);if(a==='r')localStorage.removeItem(k)}catch(e){}return null}
+var $=function(i){return document.getElementById(i)};
+var ql=/[?&]l=([a-z]{2})/.exec(location.search);
+var lang=(ql&&ql[1])||ls('g','kitLang_v1')||ls('g','pt_lang')||(navigator.language||'es').slice(0,2);if(!T[lang])lang='es';
+function render(){
+  var d=T[lang];document.documentElement.lang=lang;
+  var h='<h1>'+d.t+'</h1><p class="mu">'+d.upd+'</p>';
+  for(var i=1;i<=6;i++)h+='<h2>'+d['s'+i]+'</h2>'+(d['b'+i].charAt(0)==='<'?d['b'+i]:'<p>'+d['b'+i]+'</p>');
+  $('doc').innerHTML=h;
+  ['dT','dB','dL','dBtn','dW','dYes','dNo'].forEach(function(k){$(k).textContent=d[k]});
+  [].forEach.call(document.querySelectorAll('.bt'),function(e){e.textContent=({es:'Volver al inicio',ca:'Tornar a l\'inici',en:'Back to home'})[lang]});
+  [].forEach.call(document.querySelectorAll('.lang button'),function(b){b.classList.toggle('on',b.dataset.l===lang)});
+}
+[].forEach.call(document.querySelectorAll('.lang button'),function(b){b.onclick=function(){lang=b.dataset.l;ls('s','pt_lang',lang);render()}});
+var m=/[?&]k=([^&#]+)/.exec(location.search);
+$('dK').value=m?decodeURIComponent(m[1]).trim():(ls('g','pt_key')||'');
+function msg(t,c){var e=$('dM');e.textContent=t;e.className='msg '+(c||'')}
+$('dBtn').onclick=function(){
+  if(!$('dK').value.trim()){msg(T[lang].mNo,'er');return}
+  msg('');$('dStep1').classList.add('hide');$('dStep2').classList.remove('hide');
+};
+$('dNo').onclick=function(){$('dStep2').classList.add('hide');$('dStep1').classList.remove('hide');msg('')};
+$('dYes').onclick=function(){
+  var b=this;b.disabled=true;
+  fetch(SB_URL+'/rest/v1/rpc/borrar_mis_datos',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY},body:JSON.stringify({p_clave:$('dK').value.trim()})})
+  .then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){
+    b.disabled=false;$('dStep2').classList.add('hide');
+    if(j&&j.ok){
+      ['pt_key','pt_dev','pt_sess','pt_lang','equipoApp_v1','kitLang_v1','kitNight_v1','kitZoom_v1','mw_night_v1','mw_sessions_v1'].forEach(function(k){ls('r',k)});
+      $('delCard').querySelector('#dB').classList.add('hide');msg(T[lang].mOk,'ok');setTimeout(function(){location.href='./'},3500);
+    }else{$('dStep1').classList.remove('hide');msg(T[lang].mBad,'er')}
+  }).catch(function(){b.disabled=false;$('dStep2').classList.add('hide');$('dStep1').classList.remove('hide');msg(T[lang].mNet,'er')});
+};
+render();
+})();
+</script>
+</body>
+</html>
