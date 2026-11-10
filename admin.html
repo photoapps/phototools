@@ -126,7 +126,8 @@ body.in{background:radial-gradient(1200px 600px at 50% -10%,#1c1a26 0,#0b0b10 60
 </form></div>
 
 <div id="app" class="hide">
-  <div class="sub"><span class="dot"></span><span id="upd">Actualizando…</span><button class="ghost" id="bRef" type="button" style="padding:4px 10px;font-size:12.5px">↻ Actualizar</button></div>
+  <div class="sub"><span class="dot"></span><span id="upd">Actualizando…</span><button class="ghost" id="bRef" type="button" style="padding:4px 10px;font-size:12.5px">↻ Actualizar</button><button class="ghost" id="bBak" type="button" style="padding:4px 10px;font-size:12.5px">💾 Copia de seguridad</button></div>
+  <div class="mu hide" id="bakMsg" style="font-size:12.5px;margin:-4px 0 10px"></div>
   <button type="button" class="rem hide" id="igRem"></button>
   <div class="stats" id="stats"></div>
   <div class="now hide" id="nowBox"></div>
@@ -432,6 +433,21 @@ $('qx').onclick=function(){var q=$('q');q.value='';this.classList.remove('on');r
 $('flt').onclick=function(e){var c=e.target.closest('[data-f]');if(c){filt=c.dataset.f;render()}};
 $('nowBox').onclick=function(e){var c=e.target.closest('[data-nm]');if(c){$('q').value=c.dataset.nm;$('qx').classList.add('on');filt='all';render();$('q').scrollIntoView({behavior:'smooth',block:'center'})}};
 $('bRef').onclick=function(){load()};
+function bakInfo(){var t='';try{t=localStorage.getItem('ptAdminBak')||''}catch(e){}var m=$('bakMsg');if(!m)return;if(t){var d=Math.floor((Date.now()-Number(t))/864e5);m.textContent='Última copia: '+new Date(Number(t)).toLocaleString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+(d>=7?' · hace '+d+' días, conviene hacer otra':'');m.classList.remove('hide')}else{m.textContent='Aún no has hecho ninguna copia de seguridad.';m.classList.remove('hide')}}
+$('bBak').onclick=function(){
+  var b=$('bBak'),o=b.textContent;b.disabled=true;b.textContent='Preparando…';
+  Promise.all([rpc('admin_listar',{p_pass:pass}),rpc('admin_apoyos',{p_pass:pass}),rpc('admin_stats',{p_pass:pass})]).then(function(r){
+    if(!r[0]||!r[0].ok||!r[1]||!r[1].ok)throw new Error('sin acceso');
+    var out={app:'PhotoTools+ admin',version:1,fecha:new Date().toISOString(),accesos:r[0].accesos||[],apoyos:r[1].pagos||[],estadisticas:r[2]&&r[2].ok?r[2]:null};
+    var blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+    var d=new Date(),n='PhotoTools-copia-'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.json';
+    var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url)},4000);
+    try{localStorage.setItem('ptAdminBak',String(Date.now()))}catch(e){}
+    bakInfo();b.textContent='✓ '+out.accesos.length+' accesos · '+out.apoyos.length+' apoyos';setTimeout(function(){b.textContent=o;b.disabled=false},3500);
+  }).catch(function(){b.textContent='No se pudo, reintenta';setTimeout(function(){b.textContent=o;b.disabled=false},3000)});
+};
+bakInfo();
+
 try{var sl=localStorage.getItem('adm_lang');if(sl&&MSG[sl])$('lang').value=sl}catch(e){}
 $('lang').onchange=function(){try{localStorage.setItem('adm_lang',this.value)}catch(e){}};
 $('fNew').onsubmit=function(e){
