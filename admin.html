@@ -182,6 +182,8 @@ body.in{background:radial-gradient(1200px 600px at 50% -10%,#1c1a26 0,#0b0b10 60
 'use strict';
 var SB_URL='https://htskwweyxwlgnbeivugi.supabase.co',SB_KEY='sb_publishable__3EApIwiBv4AMbyJ-R-csQ_R7UeJ5Q5',pass='',data=[],open_={},ST=null,skew=0,filt='all',tmr=null,lastOk=0;
 function disp(u){u=u||'';var o=/iPad/.test(u)?'iPad':/iPhone/.test(u)?'iPhone':/Android/.test(u)?'Android':/Macintosh/.test(u)?'Mac':/Windows/.test(u)?'Windows':/Linux/.test(u)?'Linux':'';var n=/CriOS|Chrome\//.test(u)?'Chrome':/FxiOS|Firefox/.test(u)?'Firefox':/EdgiOS|Edg\//.test(u)?'Edge':/Safari/.test(u)?'Safari':'';var v=(/OS (\d+)[_\d]*/.exec(u)||/Android (\d+)/.exec(u)||[])[1];var r=[o+(v?' '+v:''),n].filter(Boolean).join(' · ');return r||u.slice(0,60)||'(sin datos)'}
+function navegador(u){u=u||'';return /EdgiOS|Edg\//.test(u)?'Edge':/OPR\/|OPiOS/.test(u)?'Opera':/FxiOS|Firefox/.test(u)?'Firefox':/SamsungBrowser/.test(u)?'Samsung Internet':/CriOS|Chrome\//.test(u)?'Chrome':/Safari/.test(u)?'Safari':'Navegador'}
+function grupos(l){var o={},r=[];(l||[]).forEach(function(d){var k=d.huella||('id'+d.id),g=o[k];if(!g){g=o[k]={m:[],os:disp(d.agente).split(' · ')[0]||'Dispositivo',primer:d.primer,ultimo:d.ultimo,ap:0};r.push(g)}g.m.push(d);g.ap+=(d.aperturas||0);if(Date.parse(d.primer)<Date.parse(g.primer))g.primer=d.primer;if(Date.parse(d.ultimo)>Date.parse(g.ultimo))g.ultimo=d.ultimo});return r}
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function rpc(fn,body){
@@ -289,14 +291,14 @@ function render(){
   rows.sort(srt==='nom'?function(a,b){return a.nombre.localeCompare(b.nombre)}:srt==='ape'?function(a,b){return b.aperturas-a.aperturas}:srt==='new'?function(a,b){return Date.parse(b.creado)-Date.parse(a.creado)}:srt==='dev'?function(a,b){return b.dispositivos.length-a.dispositivos.length}:function(a,b){return U(b)-U(a)});
   $('cnt').textContent=rows.length+(rows.length==data.length?'':' de '+data.length)+' persona'+(rows.length==1?'':'s');
   $('list').innerHTML=rows.map(function(a){
-    var n=a.dispositivos.length,on=isOn(a);
+    var G=grupos(a.dispositivos),n=G.length,on=isOn(a);
     return '<div class="card'+(open_[a.id]?'':' c')+'" data-id="'+a.id+'"><div class="p" data-a="tog"><span class="name"><span class="od '+(on?'on':isRec(a)?'rec':'')+'"></span> '+(a.apoyo?'⭐ ':'')+(a.vip?'💎 ':'')+esc(a.nombre)+igBadge(a)+'<span class="chev">▶</span></span><span><span class="pill '+(a.activa?'on':'off')+'">'+(a.activa?'activo':'anulado')+'</span> <span class="pill">'+n+' / '+a.max+' disp.</span> <span class="pill ap">'+a.aperturas+' aperturas</span>'+(a.apoyo?' <span class="pill sup">⭐ Apoya</span>':'')+(a.vip?' <span class="pill vip">💎 VIP</span>':'')+'</span></div>'
      +'<div class="ago" style="margin-top:4px">'+(on?'<span style="color:var(--ok)">● En línea</span>':a.ultimo?'Visto '+ago(a.ultimo):'Aún no ha entrado')+' · alta '+ago(a.creado)+'</div>'
      +'<div class="det"><div class="mu" style="margin-top:8px">Enlace: …?k='+esc(a.clave)+'</div>'
      +'<div class="sup-box"><div><b>⭐ Apoya el proyecto</b><div class="mu">Da acceso a las herramientas de apoyo (Red Sprites…)</div></div><button class="sw'+(a.apoyo?' on':'')+'" data-a="apoyo" role="switch" aria-checked="'+(!!a.apoyo)+'" aria-label="Apoya el proyecto"></button></div>'
      +'<div class="sup-box vb"><div><b>💎 VIP (invitado)</b><div class="mu">Acceso a las herramientas de apoyo sin haber aportado</div></div><button class="sw'+(a.vip?' on':'')+'" data-a="vip" role="switch" aria-checked="'+(!!a.vip)+'" aria-label="VIP"></button></div>'
      +apFicha(a)+igFicha(a)
-     +a.dispositivos.map(function(d){return '<div class="dev"><span><b style="color:var(--tx)">'+esc(disp(d.agente))+'</b><br>Primero: '+fecha(d.primer)+' · Último: '+fecha(d.ultimo)+' ('+ago(d.ultimo)+') · '+(d.aperturas||0)+' aperturas</span><button class="ghost warn" data-a="quitar" data-d="'+d.id+'">Quitar</button></div>'}).join('')
+     +G.map(function(g){var ids=g.m.map(function(d){return d.id}).join(',');return '<div class="dev"><span><b style="color:var(--tx)">'+esc(g.os)+'</b>'+(g.m.length>1?' <span class="mu">· '+g.m.length+' navegadores</span>':'')+'<br>'+g.m.map(function(d){return esc(navegador(d.agente))}).filter(function(v,i,r){return r.indexOf(v)===i}).join(', ')+'<br>Primero: '+fecha(g.primer)+' · Último: '+fecha(g.ultimo)+' ('+ago(g.ultimo)+') · '+g.ap+' aperturas</span><button class="ghost warn" data-a="quitar" data-d="'+ids+'">Quitar</button></div>'}).join('')
      +'<div class="acts"><button class="ghost" data-a="ren">✏️ Editar nombre</button><button class="ghost" data-a="copiar">Copiar enlace</button><button class="ghost" data-a="msg">Copiar mensaje</button><button class="ghost" data-a="limite">Cambiar límite</button>'
      +(n?'<button class="ghost" data-a="liberar">Liberar dispositivos</button>':'')
      +'<button class="ghost" data-a="'+(a.activa?'anular':'activar')+'">'+(a.activa?'Anular':'Reactivar')+'</button><button class="ghost warn" data-a="borrar">Borrar</button></div></div></div>';
@@ -309,7 +311,7 @@ $('list').onclick=function(e){
   var card=b.closest('.card'),id=card.dataset.id,a=data.filter(function(x){return x.id===id})[0],ac=b.dataset.a;$('eApp').textContent='';
   if(ac==='copiar')copy(link(a.clave),b);
   else if(ac==='msg')copy(mensaje(a),b);
-  else if(ac==='quitar'){if(confirm('¿Quitar este dispositivo? Esa persona podrá registrar uno nuevo.'))rpc('admin_quitar_dispositivo',{p_pass:pass,p_id:b.dataset.d}).then(load)}
+  else if(ac==='quitar'){if(confirm('¿Quitar este dispositivo? Esa persona podrá registrar uno nuevo.'))Promise.all(b.dataset.d.split(',').map(function(x){return rpc('admin_quitar_dispositivo',{p_pass:pass,p_id:x})})).then(load)}
   else if(ac==='limite'){var v=prompt('Máximo de dispositivos para '+a.nombre+':',a.max);if(v&&+v>0)act('limite',id,Math.round(+v))}
   else if(ac==='liberar'){if(confirm('¿Borrar todos los dispositivos de '+a.nombre+'? Empezará de cero con el mismo enlace.'))act('liberar',id)}
   else if(ac==='anular'){if(confirm('¿Anular el enlace de '+a.nombre+'? Dejará de poder entrar.'))act('anular',id)}
