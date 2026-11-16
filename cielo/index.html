@@ -61,19 +61,19 @@ input[type=range]{width:100%;accent-color:var(--acc);margin-top:6px}
 <div class="lab" style="margin-top:12px"><span>Nombres en pantalla</span></div><div class="seg" id="segDetail"><button data-d="low" class="a">Pocos</button><button data-d="mid">Normal</button><button data-d="all">Todos</button></div>
 <button class="tg on" data-l="timebar"><span>⏱ Control de hora en pantalla<small>Arrastra para ver el cielo antes o después</small></span><span class="sw"></span></button>
 <button class="tg on" data-l="stars"><span>✦ Nombres de estrellas</span><span class="sw"></span></button>
-<button class="tg on" data-l="lines"><span>☆ Líneas de constelaciones</span><span class="sw"></span></button>
+<button class="tg" data-l="lines"><span>☆ Líneas de constelaciones</span><span class="sw"></span></button>
 <button class="tg on" data-l="names"><span>Aa Nombres de constelaciones</span><span class="sw"></span></button>
 <button class="tg on" data-l="dso"><span>◌ Nebulosas, cúmulos y galaxias<small>Messier y otros</small></span><span class="sw"></span></button>
 <button class="tg on" data-l="planets"><span>♃ Sol, Luna y planetas</span><span class="sw"></span></button>
 <button class="tg on" data-l="hor"><span>⛰ Horizonte y puntos cardinales<small>Silueta, N, E, S, O</small></span><span class="sw"></span></button>
 <button class="tg" data-l="ground"><span>⛰ Tapar el cielo bajo el horizonte<small>Suelo opaco, como en la realidad</small></span><span class="sw"></span></button>
-<button class="tg on" data-l="cam"><span>📐 Marco de mi cámara</span><span class="sw"></span></button>
-<div id="camBox" style="display:block">
+<button class="tg" data-l="cam"><span>📐 Marco de mi cámara</span><span class="sw"></span></button>
+<div id="camBox" style="display:none">
 <div class="seg" id="segSensor"><button data-s="36x24" class="a">Full frame</button><button data-s="23.5x15.6">APS-C</button><button data-s="22.3x14.9">APS-C Canon</button><button data-s="17.3x13">M4/3</button></div>
 <div class="lab"><span>Focal</span><b id="fLab">24 mm</b></div><input type="range" id="fR" min="8" max="600" value="24">
 <div class="seg" id="segOri"><button data-o="h" class="a">Horizontal</button><button data-o="v">Vertical</button></div></div>
-<div class="lab"><span>Brillo del cielo</span><b id="bLab">100 %</b></div><input type="range" id="bR" min="50" max="260" value="100">
-<div class="lab"><span>Hidrógeno alfa (gas rojo)</span><b id="hLab">45 %</b></div><input type="range" id="hR" min="0" max="150" value="45">
+<div class="lab"><span>Brillo del cielo</span><b id="bLab">60 %</b></div><input type="range" id="bR" min="50" max="260" value="60">
+<div class="lab"><span>Hidrógeno alfa (gas rojo)</span><b id="hLab">50 %</b></div><input type="range" id="hR" min="0" max="150" value="50">
 <div class="lab"><span>Hora</span><b id="tLab">Ahora</b><button type="button" id="tNow2" class="pill">↺ Ahora</button></div><input type="range" id="tR" min="-720" max="720" value="0" step="5">
 <button type="button" class="btn sec" id="tNow">↺ Volver a ahora</button>
 <div style="font-size:11px;color:#6f7a96;margin-top:16px;line-height:1.4">Mapa del cielo: NASA SVS, Deep Star Maps 2020 (Hipparcos, Tycho-2, Gaia DR2). Gas de hidrógeno alfa: Finkbeiner 2003, ApJS 146, 407 (WHAM, VTSS, SHASSA).</div>
@@ -351,9 +351,9 @@ return new kd(this.curr.time,a,b)};$jscomp.global.Object.defineProperties(H.prot
 const D2R=Math.PI/180, R2D=180/Math.PI, TAU=Math.PI*2;
 const $=id=>document.getElementById(id);
 /* ---------- estado ---------- */
-const S={detail:'low',ha:0.45,lat:41.1189,lon:1.2445,place:'Tarragona',tOff:0,mode:'drag',az:90,alt:35,fov:100,
-  L:{timebar:true,stars:true,lines:true,names:true,hor:true,ground:false,dso:true,planets:true,cam:true},
-  cam:{w:36,h:24,f:24,ori:'h'},bright:1,target:null,sel:null,q:null,
+const S={detail:'low',ha:0.5,lat:41.1189,lon:1.2445,place:'Tarragona',tOff:0,mode:'drag',az:90,alt:35,fov:100,
+  L:{timebar:true,stars:true,lines:false,names:true,hor:true,ground:false,dso:true,planets:true,cam:false},
+  cam:{w:36,h:24,f:24,ori:'h'},bright:0.6,target:null,sel:null,q:null,
   corr:0, ios:null, gy:null, rc:[1,0,0,0,1,0,0,0,1], rcSmooth:null, haveAbs:false};
 try{const o=JSON.parse(localStorage.getItem('cielo')||'{}'); if(o.corr!=null) S.corr=o.corr; if(o.q) S.q=o.q;}catch(e){}
 function save(){try{localStorage.setItem('cielo',JSON.stringify({corr:S.corr,q:S.q}))}catch(e){}}
@@ -544,9 +544,11 @@ function drawOverlay(){
 }
 let HITS=[];
 const IMP=new Set(['M31','M42','M45','M8','M20','M17','M16','M13','M27','M57','M1','M51','M81','M82','M33','M44','M7','M6','M22','M4','M104','M101','M24','NGC 7000','NGC 6960','NGC 6992','NGC 2237','NGC 281','NGC 6888','NGC 7293','NGC 869','IC 1805','NGC 2264','NGC 1499','IC 1396','NGC 3372','LMC','SMC','NGC 2024','IC 5070']);
+const TOP=new Set(['M31','M42','M45','M8','M13','LMC','SMC','NGC 7000','NGC 3372','M44']);
 function dsoShow(d){const id=d[0],mag=d[5],sz=d[6],f=S.fov,lv=S.detail;
   if(lv==='all')return mag<=(f<30?99:f<60?9:7.2)||sz>=90;
-  if(IMP.has(id))return true;
+  if(TOP.has(id))return true;
+  if(IMP.has(id))return f<45;
   if(lv==='mid')return (f<70&&mag<=7.5)||(f<35&&mag<=9.5);
   return f<20&&mag<=8.5}
 function starLim(){const f=S.fov,add=S.detail==='all'?1.4:S.detail==='mid'?0.7:0;return (f>=80?1.2:f>=50?1.7:f>=30?2.3:f>=15?3.1:4.0)+add}
