@@ -20,6 +20,9 @@ button{font:inherit;color:inherit;background:none;border:0;touch-action:manipula
 #top .chip{position:static;pointer-events:auto}
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#262c3cee;border:1px solid #3a4260;border-radius:18px;padding:8px 14px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:6;white-space:nowrap}
 #toast.on{opacity:1}
+#tbar{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom,0px));height:44px;border-radius:24px;background:#262c3ccc;border:1px solid #3a4260;display:flex;align-items:center;gap:10px;padding:0 12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:5}
+#tbar input{flex:1;min-width:0;accent-color:#ff9d2e}#tbar b{font-size:12.5px;min-width:52px;text-align:right}#tbar .pill{margin:0;white-space:nowrap}#tbar.hide{display:none}
+body.tb #toast{bottom:calc(134px + env(safe-area-inset-bottom,0px))}
 .sheet{position:fixed;left:0;right:0;bottom:0;background:#0f1424f4;border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:16px 18px calc(22px + env(safe-area-inset-bottom,0px));z-index:10;transform:translateY(105%);transition:transform .28s ease;max-height:82vh;overflow:auto;touch-action:pan-y}
 .sheet.open{transform:none}
 .sheet h3{font-size:19px;font-weight:700}.sheet .s{font-size:13px;color:var(--dim);margin-top:2px}
@@ -45,6 +48,7 @@ input[type=range]{width:100%;accent-color:var(--acc);margin-top:6px}
 <canvas id="gl"></canvas><canvas id="ov"></canvas>
 <div id="top"><div class="chip" id="chTime">📍 …</div><div class="chip" id="chMode">🎯 Arrastrar</div></div>
 <div id="toast"></div>
+<div id="tbar"><button type="button" id="tbNow" class="pill">↺ Ahora</button><input type="range" id="tbR" min="-720" max="720" value="0" step="5" aria-label="Hora"><b id="tbLab">Ahora</b></div>
 <div id="bar"><button class="rb" id="bLayers" aria-label="Capas">☰</button><div id="comp"><canvas id="cc"></canvas></div><button class="rb" id="bSearch" aria-label="Buscar">⌕</button></div>
 
 <div class="sheet" id="shInfo"><div class="grab"></div><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><h3 id="iName"></h3><div class="s" id="iSub"></div></div><button id="iX" style="font-size:22px;color:var(--dim);padding:0 4px">✕</button></div>
@@ -54,6 +58,8 @@ input[type=range]{width:100%;accent-color:var(--acc);margin-top:6px}
 
 <div class="sheet" id="shLayers"><div class="grab"></div><h3>Capas del cielo</h3>
 <div class="seg" id="segMode"><button data-m="gyro">Giroscopio</button><button data-m="drag" class="a">Arrastrar</button></div>
+<div class="lab" style="margin-top:12px"><span>Nombres en pantalla</span></div><div class="seg" id="segDetail"><button data-d="low" class="a">Pocos</button><button data-d="mid">Normal</button><button data-d="all">Todos</button></div>
+<button class="tg on" data-l="timebar"><span>⏱ Control de hora en pantalla<small>Arrastra para ver el cielo antes o después</small></span><span class="sw"></span></button>
 <button class="tg on" data-l="stars"><span>✦ Nombres de estrellas</span><span class="sw"></span></button>
 <button class="tg on" data-l="lines"><span>☆ Líneas de constelaciones</span><span class="sw"></span></button>
 <button class="tg on" data-l="names"><span>Aa Nombres de constelaciones</span><span class="sw"></span></button>
@@ -345,8 +351,8 @@ return new kd(this.curr.time,a,b)};$jscomp.global.Object.defineProperties(H.prot
 const D2R=Math.PI/180, R2D=180/Math.PI, TAU=Math.PI*2;
 const $=id=>document.getElementById(id);
 /* ---------- estado ---------- */
-const S={ha:0.45,lat:41.1189,lon:1.2445,place:'Tarragona',tOff:0,mode:'drag',az:90,alt:35,fov:100,
-  L:{stars:true,lines:true,names:true,hor:true,ground:false,dso:true,planets:true,cam:true},
+const S={detail:'low',ha:0.45,lat:41.1189,lon:1.2445,place:'Tarragona',tOff:0,mode:'drag',az:90,alt:35,fov:100,
+  L:{timebar:true,stars:true,lines:true,names:true,hor:true,ground:false,dso:true,planets:true,cam:true},
   cam:{w:36,h:24,f:24,ori:'h'},bright:1,target:null,sel:null,q:null,
   corr:0, ios:null, gy:null, rc:[1,0,0,0,1,0,0,0,1], rcSmooth:null, haveAbs:false};
 try{const o=JSON.parse(localStorage.getItem('cielo')||'{}'); if(o.corr!=null) S.corr=o.corr; if(o.q) S.q=o.q;}catch(e){}
@@ -477,7 +483,7 @@ function buildObjs(){
 }
 const nrm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 /* ---------- dibujo del overlay ---------- */
-let dirty=true,labels=[];
+let dirty=true,labels=[],BOTM=90;
 function rectHit(r){for(const q of labels){if(r[0]<q[2]&&r[2]>q[0]&&r[1]<q[3]&&r[3]>q[1])return true}return false}
 function label(txt,x,y,o={}){
   const sz=o.size||12.5;ctx.font=`${o.weight||500} ${sz}px -apple-system,Segoe UI,Roboto,Arial`;
@@ -487,7 +493,7 @@ function label(txt,x,y,o={}){
   ctx.fillStyle=o.col||'#dfe5f6';ctx.shadowColor='#000';ctx.shadowBlur=4;
   if(ls){ctx.letterSpacing=ls+'px'}ctx.textAlign='left';ctx.fillText(txt,x0,y);if(ls)ctx.letterSpacing='0px';ctx.shadowBlur=0;return true}
 function drawOverlay(){
-  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);labels=[];RcT=tr(S.rc);
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);labels=[];RcT=tr(S.rc);BOTM=S.L.timebar?150:90;
   const sc=H/ S.fov;                       // px por grado (aprox.)
   // constelaciones: líneas
   if(S.L.lines){ctx.strokeStyle='rgba(110,140,225,.30)';ctx.lineWidth=1.1;ctx.beginPath();
@@ -495,21 +501,21 @@ function drawOverlay(){
     ctx.stroke();}
   // horizonte: marcas cardinales
   const card=[['N',0],['NE',45],['E',90],['SE',135],['S',180],['SO',225],['O',270],['NO',315]];
-  if(S.L.hor)for(const [n,a] of card){const h=[Math.sin(a*D2R)*Math.cos(0.03),Math.cos(a*D2R)*Math.cos(0.03),Math.sin(0.03)];const q=projH(h);if(q&&q[0]>10&&q[0]<W-10&&q[1]>60&&q[1]<H-80)label(n,q[0],q[1]-6,{align:'center',col:n.length===1?'#ffb25a':'#9aa4bd',size:n.length===1?15:12,weight:700,force:true})}
+  if(S.L.hor)for(const [n,a] of card){const h=[Math.sin(a*D2R)*Math.cos(0.03),Math.cos(a*D2R)*Math.cos(0.03),Math.sin(0.03)];const q=projH(h);if(q&&q[0]>10&&q[0]<W-10&&q[1]>60&&q[1]<H-BOTM+10)label(n,q[0],q[1]-6,{align:'center',col:n.length===1?'#ffb25a':'#9aa4bd',size:n.length===1?15:12,weight:700,force:true})}
   // nombres de constelaciones
-  if(S.L.names){for(const c of DATA.cons){if(!c[2])continue;const q=proj(eqv(c[2][0],c[2][1]));if(q&&!below(q)&&q[0]>20&&q[0]<W-20&&q[1]>70&&q[1]<H-90)label(c[1].replace(/ /g,' ').toUpperCase(),q[0],q[1],{align:'center',col:'rgba(138,160,216,.9)',size:12.5,weight:700,ls:2.5})}}
+  if(S.L.names){for(const c of DATA.cons){if(!c[2])continue;const q=proj(eqv(c[2][0],c[2][1]));if(q&&!below(q)&&q[0]>20&&q[0]<W-20&&q[1]>70&&q[1]<H-BOTM)label(c[1].replace(/ /g,' ').toUpperCase(),q[0],q[1],{align:'center',col:'rgba(138,160,216,.9)',size:12.5,weight:700,ls:2.5})}}
   // DSO
   const hit=[];
   if(S.L.dso){const lim=S.fov<30?99:S.fov<60?9:7.2;
-    for(const d of DATA.dsos){if(d[5]>lim&&!(d[6]>=90))continue;const q=proj(eqv(d[3],d[4]));if(!q||below(q)||q[0]<-30||q[0]>W+30||q[1]<-30||q[1]>H+30)continue;
+    for(const d of DATA.dsos){if(!dsoShow(d))continue;const q=proj(eqv(d[3],d[4]));if(!q||below(q)||q[0]<-30||q[0]>W+30||q[1]<-30||q[1]>H+30)continue;
       const rpx=Math.max(9,(d[6]/60/2)*sc);ctx.strokeStyle='rgba(170,190,235,.85)';ctx.lineWidth=1.2;ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(q[0],q[1],Math.min(rpx,W),0,TAU);ctx.stroke();ctx.setLineDash([]);
-      const nm=d[1]||d[0];if(q[1]>70&&q[1]<H-90)label(nm,q[0]+Math.min(rpx,120)*0.72+6,q[1]+4,{col:'#d5ddf2',size:12,fx:q[0]-Math.min(rpx,120)*0.72-6});
+      const nm=d[1]||d[0];if(q[1]>70&&q[1]<H-BOTM)label(nm,q[0]+Math.min(rpx,120)*0.72+6,q[1]+4,{col:'#d5ddf2',size:12,fx:q[0]-Math.min(rpx,120)*0.72-6});
       hit.push({o:d,x:q[0],y:q[1],r:Math.min(60,Math.max(rpx,16)),ref:'dso'})}}
   // estrellas con nombre
-  if(S.L.stars){const lim=S.fov<25?4.2:S.fov<50?3.0:2.2;
-    for(const s of DATA.stars){if(s[3]>lim)break;const q=proj(eqv(s[1],s[2]));if(!q||below(q)||q[0]<10||q[0]>W-10||q[1]<70||q[1]>H-90)continue;label(s[0],q[0]+8,q[1]+4,{size:12.5,fx:q[0]-8});hit.push({o:s,x:q[0],y:q[1],r:16,ref:'star'})}}
+  if(S.L.stars){const lim=starLim();
+    for(const s of DATA.stars){if(s[3]>lim)break;const q=proj(eqv(s[1],s[2]));if(!q||below(q)||q[0]<10||q[0]>W-10||q[1]<70||q[1]>H-BOTM)continue;label(s[0],q[0]+8,q[1]+4,{size:12.5,fx:q[0]-8});hit.push({o:s,x:q[0],y:q[1],r:16,ref:'star'})}}
   // planetas
-  if(S.L.planets){for(const b of BODIES){const q=proj(eqv(b.ra,b.dec));if(!q||below(q)||q[1]<40||q[1]>H-70)continue;
+  if(S.L.planets){for(const b of BODIES){const q=proj(eqv(b.ra,b.dec));if(!q||below(q)||q[1]<40||q[1]>H-BOTM+20)continue;
     const r=Math.max(b.r,b.id==='Sun'?9:b.id==='Moon'?Math.max(7,0.26*sc):b.r);
     ctx.save();ctx.shadowColor=b.col;ctx.shadowBlur=14;ctx.fillStyle=b.col;ctx.beginPath();ctx.arc(q[0],q[1],r*(b.id==='Moon'||b.id==='Sun'?1:0.7),0,TAU);ctx.fill();ctx.restore();
     if(b.id==='Moon'){const rr=Math.max(7,0.26*sc),ph=b.phase,k=Math.cos(ph*D2R),sg=ph<180?1:-1;
@@ -521,7 +527,7 @@ function drawOverlay(){
   // objetivo seleccionado
   if(S.sel){const q=proj(S.sel.e);if(q){ctx.strokeStyle='#ff9d2e';ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(q[0],q[1],24,0,TAU);ctx.stroke();for(const [dx,dy] of [[0,-1],[0,1],[-1,0],[1,0]]){ctx.beginPath();ctx.moveTo(q[0]+dx*24,q[1]+dy*24);ctx.lineTo(q[0]+dx*36,q[1]+dy*36);ctx.stroke()}}}
   // flecha de guía
-  if(S.target){const q=proj(S.target.e);const inside=q&&q[0]>40&&q[0]<W-40&&q[1]>90&&q[1]<H-110;
+  if(S.target){const q=proj(S.target.e);const inside=q&&q[0]>40&&q[0]<W-40&&q[1]>90&&q[1]<H-BOTM-20;
     if(!inside){const hv=mv(SM,S.target.e),c=mv(RcT,hv);let dx=c[0],dy=c[1];if(c[2]>0){dx=-dx;dy=-dy}if(Math.abs(dx)+Math.abs(dy)<1e-6)dx=1;
       const L=Math.hypot(dx,dy);dx/=L;dy/=L;const cx=W/2,cy=H/2,ex=W*0.38,ey=H*0.36;const t=Math.min(ex/Math.abs(dx||1e-6),ey/Math.abs(dy||1e-6));const ax=cx+dx*t,ay=cy-dy*t;
       ctx.save();ctx.translate(ax,ay);ctx.rotate(Math.atan2(-dy,dx));ctx.fillStyle='#ff9d2e';ctx.shadowColor='#000';ctx.shadowBlur=8;ctx.beginPath();ctx.moveTo(24,0);ctx.lineTo(-10,-14);ctx.lineTo(-3,0);ctx.lineTo(-10,14);ctx.closePath();ctx.fill();ctx.restore();
@@ -537,6 +543,13 @@ function drawOverlay(){
   HITS=hit;
 }
 let HITS=[];
+const IMP=new Set(['M31','M42','M45','M8','M20','M17','M16','M13','M27','M57','M1','M51','M81','M82','M33','M44','M7','M6','M22','M4','M104','M101','M24','NGC 7000','NGC 6960','NGC 6992','NGC 2237','NGC 281','NGC 6888','NGC 7293','NGC 869','IC 1805','NGC 2264','NGC 1499','IC 1396','NGC 3372','LMC','SMC','NGC 2024','IC 5070']);
+function dsoShow(d){const id=d[0],mag=d[5],sz=d[6],f=S.fov,lv=S.detail;
+  if(lv==='all')return mag<=(f<30?99:f<60?9:7.2)||sz>=90;
+  if(IMP.has(id))return true;
+  if(lv==='mid')return (f<70&&mag<=7.5)||(f<35&&mag<=9.5);
+  return f<20&&mag<=8.5}
+function starLim(){const f=S.fov,add=S.detail==='all'?1.4:S.detail==='mid'?0.7:0;return (f>=80?1.2:f>=50?1.7:f>=30?2.3:f>=15?3.1:4.0)+add}
 /* ---------- barra de brújula ---------- */
 function drawComp(){
   const cc=$('cc'),c=cc.getContext('2d'),w=cc.width,h=cc.height;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,w,h);c.scale(DPR,DPR);const cw=w/DPR,ch=h/DPR;
@@ -627,15 +640,20 @@ function openSheet(id){closeAll(true);$(id).classList.add('open')}
 function closeAll(keep){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));if(!keep){S.sel=null;}dirty=true}
 $('bLayers').onclick=()=>$('shLayers').classList.contains('open')?closeAll():openSheet('shLayers');
 $('bSearch').onclick=()=>{openSheet('shSearch');$('q').value='';$('res').innerHTML='';setTimeout(()=>$('q').focus(),300)};
-document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{const k=b.dataset.l;S.L[k]=!S.L[k];b.classList.toggle('on',S.L[k]);if(k==='cam')$('camBox').style.display=S.L.cam?'block':'none';dirty=true});
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{const k=b.dataset.l;S.L[k]=!S.L[k];b.classList.toggle('on',S.L[k]);if(k==='cam')$('camBox').style.display=S.L.cam?'block':'none';if(k==='timebar'){$('tbar').classList.toggle('hide',!S.L.timebar);document.body.classList.toggle('tb',S.L.timebar)}dirty=true});
 document.querySelectorAll('#segMode button').forEach(b=>b.onclick=()=>{if(b.dataset.m==='gyro')startGyro();else setMode('drag')});
+document.querySelectorAll('#segDetail button').forEach(b=>b.onclick=()=>{S.detail=b.dataset.d;document.querySelectorAll('#segDetail button').forEach(x=>x.classList.toggle('a',x===b));dirty=true});
 document.querySelectorAll('#segSensor button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#segSensor button').forEach(x=>x.classList.toggle('a',x===b));const [w,h]=b.dataset.s.split('x').map(Number);S.cam.w=w;S.cam.h=h;dirty=true});
 document.querySelectorAll('#segOri button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#segOri button').forEach(x=>x.classList.toggle('a',x===b));S.cam.ori=b.dataset.o;dirty=true});
 $('fR').oninput=e=>{S.cam.f=+e.target.value;$('fLab').textContent=S.cam.f+' mm';dirty=true};
 $('bR').oninput=e=>{S.bright=+e.target.value/100;$('bLab').textContent=e.target.value+' %';dirty=true};
 $('hR').oninput=e=>{S.ha=+e.target.value/100;$('hLab').textContent=e.target.value+' %';dirty=true};
-$('tR').oninput=e=>{S.tOff=+e.target.value;$('tLab').textContent=S.tOff?((S.tOff>0?'+':'')+(S.tOff/60).toFixed(1)+' h'):'Ahora';updateBodies();dirty=true};
-function nowReset(e){if(e&&e.cancelable)e.preventDefault();const was=S.tOff;S.tOff=0;$('tR').value=0;$('tLab').textContent='Ahora';updateBodies();dirty=true;toast(was?'Hora actual':'Ya estás en la hora actual')}
+const tlbl=v=>v?((v>0?'+':'−')+(Math.abs(v)>=60?(Math.abs(v)/60).toFixed(1)+' h':Math.abs(v)+' min')):'Ahora';
+function setT(v){S.tOff=v;$('tR').value=v;$('tbR').value=v;$('tLab').textContent=tlbl(v);$('tbLab').textContent=tlbl(v);updateBodies();dirty=true}
+$('tR').oninput=e=>setT(+e.target.value);$('tbR').oninput=e=>setT(+e.target.value);
+$('tbNow').addEventListener('click',()=>setT(0));
+document.body.classList.add('tb');
+function nowReset(e){if(e&&e.cancelable)e.preventDefault();const was=S.tOff;setT(0);toast(was?'Hora actual':'Ya estás en la hora actual')}
 for(const id of ['tNow','tNow2']){const el=$(id);el.addEventListener('click',nowReset);el.addEventListener('touchend',nowReset,{passive:false})}
 document.querySelectorAll('#segQ button').forEach(b=>b.onclick=()=>{S.q=+b.dataset.q;save();toast('Cargando imagen '+S.q+'K…');loadTex(S.q).then(()=>toast('Imagen '+S.q+'K lista')).catch(()=>toast('No se pudo cargar'))});
 $('q').oninput=()=>{const q=nrm($('q').value.trim());const R=$('res');R.innerHTML='';if(q.length<1)return;
