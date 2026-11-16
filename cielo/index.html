@@ -21,7 +21,7 @@ button{font:inherit;color:inherit;background:none;border:0;touch-action:manipula
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#262c3cee;border:1px solid #3a4260;border-radius:18px;padding:8px 14px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:6;white-space:nowrap}
 #toast.on{opacity:1}
 #tbar{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom,0px));height:44px;border-radius:24px;background:#262c3ccc;border:1px solid #3a4260;display:flex;align-items:center;gap:10px;padding:0 12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:5}
-#tbar input{flex:1;min-width:0;accent-color:#ff9d2e}#tbar b{font-size:12.5px;min-width:52px;text-align:right}#tbar .pill{margin:0;white-space:nowrap}#tbar.hide{display:none}
+#tbar input{flex:1;min-width:0;accent-color:#ff9d2e}#tbar b{font-size:12.5px;min-width:78px;white-space:nowrap;text-align:right}#tbar .pill{margin:0;white-space:nowrap}#tbar.hide{display:none}
 body.tb #toast{bottom:calc(134px + env(safe-area-inset-bottom,0px))}
 .sheet{position:fixed;left:0;right:0;bottom:0;background:#0f1424f4;border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:16px 18px calc(22px + env(safe-area-inset-bottom,0px));z-index:10;transform:translateY(105%);transition:transform .28s ease;max-height:82vh;overflow:auto;touch-action:pan-y}
 .sheet.open{transform:none}
@@ -48,7 +48,7 @@ input[type=range]{width:100%;accent-color:var(--acc);margin-top:6px}
 <canvas id="gl"></canvas><canvas id="ov"></canvas>
 <div id="top"><div class="chip" id="chTime">📍 …</div><div class="chip" id="chMode">🎯 Arrastrar</div></div>
 <div id="toast"></div>
-<div id="tbar"><button type="button" id="tbNow" class="pill">↺ Ahora</button><input type="range" id="tbR" min="-720" max="720" value="0" step="5" aria-label="Hora"><b id="tbLab">Ahora</b></div>
+<div id="tbar"><button type="button" id="tbNow" class="pill">↺ Ahora</button><input type="range" id="tbR" min="-720" max="720" value="0" step="5" aria-label="Hora"><b id="tbLab">--:--</b></div>
 <div id="bar"><button class="rb" id="bLayers" aria-label="Capas">☰</button><div id="comp"><canvas id="cc"></canvas></div><button class="rb" id="bSearch" aria-label="Buscar">⌕</button></div>
 
 <div class="sheet" id="shInfo"><div class="grab"></div><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><h3 id="iName"></h3><div class="s" id="iSub"></div></div><button id="iX" style="font-size:22px;color:var(--dim);padding:0 4px">✕</button></div>
@@ -62,7 +62,7 @@ input[type=range]{width:100%;accent-color:var(--acc);margin-top:6px}
 <button class="tg on" data-l="timebar"><span>⏱ Control de hora en pantalla<small>Arrastra para ver el cielo antes o después</small></span><span class="sw"></span></button>
 <button class="tg on" data-l="stars"><span>✦ Nombres de estrellas</span><span class="sw"></span></button>
 <button class="tg" data-l="lines"><span>☆ Líneas de constelaciones</span><span class="sw"></span></button>
-<button class="tg on" data-l="names"><span>Aa Nombres de constelaciones</span><span class="sw"></span></button>
+<button class="tg" data-l="names"><span>Aa Nombres de constelaciones</span><span class="sw"></span></button>
 <button class="tg on" data-l="dso"><span>◌ Nebulosas, cúmulos y galaxias<small>Messier y otros</small></span><span class="sw"></span></button>
 <button class="tg on" data-l="planets"><span>♃ Sol, Luna y planetas</span><span class="sw"></span></button>
 <button class="tg on" data-l="hor"><span>⛰ Horizonte y puntos cardinales<small>Silueta, N, E, S, O</small></span><span class="sw"></span></button>
@@ -352,7 +352,7 @@ const D2R=Math.PI/180, R2D=180/Math.PI, TAU=Math.PI*2;
 const $=id=>document.getElementById(id);
 /* ---------- estado ---------- */
 const S={detail:'low',ha:0.5,lat:41.1189,lon:1.2445,place:'Tarragona',tOff:0,mode:'drag',az:90,alt:35,fov:100,
-  L:{timebar:true,stars:true,lines:false,names:true,hor:true,ground:false,dso:true,planets:true,cam:false},
+  L:{timebar:true,stars:true,lines:false,names:false,hor:true,ground:false,dso:true,planets:true,cam:false},
   cam:{w:36,h:24,f:24,ori:'h'},bright:0.6,target:null,sel:null,q:null,
   corr:0, ios:null, gy:null, rc:[1,0,0,0,1,0,0,0,1], rcSmooth:null, haveAbs:false};
 try{const o=JSON.parse(localStorage.getItem('cielo')||'{}'); if(o.corr!=null) S.corr=o.corr; if(o.q) S.q=o.q;}catch(e){}
@@ -610,7 +610,7 @@ function setMode(m){S.mode=m;if(m==='gyro'){S.rcSmooth=null}else if(S.gy){const 
 /* ---------- ubicación / hora ---------- */
 function geo(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.place=S.lat.toFixed(2)+'°, '+S.lon.toFixed(2)+'°';updateBodies();dirty=true},()=>{},{timeout:8000,maximumAge:600000})}
 function updateChips(){const d=new Date(nowMs());const hh=d.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}),dd=d.toLocaleDateString('es',{day:'numeric',month:'short'});
-  const t=`📍 ${S.place} · ${S.tOff?dd+' ':''}${hh}`;if($('chTime').textContent!==t)$('chTime').textContent=t}
+  const t=`📍 ${S.place} · ${S.tOff?dd+' ':''}${hh}`;if($('chTime').textContent!==t)$('chTime').textContent=t;const cl=clockLbl();if($('tbLab').textContent!==cl)$('tbLab').textContent=cl}
 /* ---------- gestos ---------- */
 const pts=new Map();let pinch0=0,fov0=0,moved=0,downT=0,downXY=null;
 ov.addEventListener('pointerdown',e=>{ov.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;downT=performance.now();downXY=[e.clientX,e.clientY];S.slew=null;
@@ -651,7 +651,8 @@ $('fR').oninput=e=>{S.cam.f=+e.target.value;$('fLab').textContent=S.cam.f+' mm';
 $('bR').oninput=e=>{S.bright=+e.target.value/100;$('bLab').textContent=e.target.value+' %';dirty=true};
 $('hR').oninput=e=>{S.ha=+e.target.value/100;$('hLab').textContent=e.target.value+' %';dirty=true};
 const tlbl=v=>v?((v>0?'+':'−')+(Math.abs(v)>=60?(Math.abs(v)/60).toFixed(1)+' h':Math.abs(v)+' min')):'Ahora';
-function setT(v){S.tOff=v;$('tR').value=v;$('tbR').value=v;$('tLab').textContent=tlbl(v);$('tbLab').textContent=tlbl(v);updateBodies();dirty=true}
+function clockLbl(){const d=new Date(nowMs()),n=new Date();let t=d.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});if(d.toDateString()!==n.toDateString())t=d.toLocaleDateString('es',{day:'numeric',month:'short'})+' '+t;return t}
+function setT(v){S.tOff=v;$('tR').value=v;$('tbR').value=v;$('tLab').textContent=tlbl(v);$('tbLab').textContent=clockLbl();updateBodies();dirty=true}
 $('tR').oninput=e=>setT(+e.target.value);$('tbR').oninput=e=>setT(+e.target.value);
 $('tbNow').addEventListener('click',()=>setT(0));
 document.body.classList.add('tb');
