@@ -66,7 +66,7 @@ input[type=range]{width:100%;accent-color:var(--acc);margin-top:6px}
 <button class="tg on" data-l="dso"><span>◌ Nebulosas, cúmulos y galaxias<small>Messier y otros</small></span><span class="sw"></span></button>
 <button class="tg on" data-l="planets"><span>♃ Sol, Luna y planetas</span><span class="sw"></span></button>
 <button class="tg on" data-l="hor"><span>⛰ Horizonte y puntos cardinales<small>Silueta, N, E, S, O</small></span><span class="sw"></span></button>
-<button class="tg" data-l="ground"><span>⛰ Tapar el cielo bajo el horizonte<small>Suelo opaco, como en la realidad</small></span><span class="sw"></span></button>
+<button class="tg on" data-l="ground"><span>⛰ Ocultar el cielo bajo el horizonte<small>Solo se ve si inclinas el móvil hacia abajo</small></span><span class="sw"></span></button>
 <button class="tg" data-l="cam"><span>📐 Marco de mi cámara</span><span class="sw"></span></button>
 <div id="camBox" style="display:none">
 <div class="seg" id="segSensor"><button data-s="36x24" class="a">Full frame</button><button data-s="23.5x15.6">APS-C</button><button data-s="22.3x14.9">APS-C Canon</button><button data-s="17.3x13">M4/3</button></div>
@@ -352,7 +352,7 @@ const D2R=Math.PI/180, R2D=180/Math.PI, TAU=Math.PI*2;
 const $=id=>document.getElementById(id);
 /* ---------- estado ---------- */
 const S={detail:'low',ha:0.5,lat:41.1189,lon:1.2445,place:'Tarragona',tOff:0,mode:'drag',az:90,alt:35,fov:100,
-  L:{timebar:true,stars:true,lines:false,names:false,hor:true,ground:false,dso:true,planets:true,cam:false},
+  L:{timebar:true,stars:true,lines:false,names:false,hor:true,ground:true,dso:true,planets:true,cam:false},
   cam:{w:36,h:24,f:24,ori:'h'},bright:0.6,target:null,sel:null,q:null,
   corr:0, ios:null, gy:null, rc:[1,0,0,0,1,0,0,0,1], rcSmooth:null, haveAbs:false};
 try{const o=JSON.parse(localStorage.getItem('cielo')||'{}'); if(o.corr!=null) S.corr=o.corr; if(o.q) S.q=o.q;}catch(e){}
@@ -470,7 +470,7 @@ function drawGL(){
   G.uniform2f(U.uTan,tanX,tanY);G.uniform2f(U.uRes,gl.width,gl.height);
   const texelRad=TAU/texSize,pxRad=(S.fov*D2R)/gl.height;
   G.uniform1f(U.uLod,Math.max(0,Math.log2(pxRad/texelRad)));
-  G.uniform1f(U.uGain,S.bright);G.uniform1f(U.uHorK,S.L.hor?1:0);G.uniform1f(U.uGndK,S.L.ground?1:0);G.uniform1f(U.uHaK,haTex?S.ha:0);G.uniform1f(U.uLodHa,Math.max(0,Math.log2(pxRad/(TAU/4096))));
+  G.uniform1f(U.uGain,S.bright);G.uniform1f(U.uHorK,S.L.hor?1:0);S.gk=gndK();G.uniform1f(U.uGndK,S.gk);G.uniform1f(U.uHaK,haTex?S.ha:0);G.uniform1f(U.uLodHa,Math.max(0,Math.log2(pxRad/(TAU/4096))));
   {const sb=BODIES.find(b=>b.id==='Sun');let sh=[0,0,-1],sa=-60;if(sb){sh=mv(SM,eqv(sb.ra,sb.dec));const n=Math.hypot(sh[0],sh[1],sh[2])||1;sh=[sh[0]/n,sh[1]/n,sh[2]/n];sa=Math.asin(Math.max(-1,Math.min(1,sh[2])))*R2D}
    S.sunAlt=sa;S.vis=1-sstep(-9,3,sa);G.uniform3f(U.uSun,sh[0],sh[1],sh[2]);G.uniform1f(U.uSunAlt,sa)}
   G.uniform1i(U.uTex,0);G.uniform1i(U.uHa,1);G.drawArrays(G.TRIANGLES,0,3);
@@ -479,7 +479,8 @@ function drawGL(){
 let RcT=null;
 function proj(e){const h=mv(SM,e),c=mv(RcT,h);if(c[2]>=-1e-4)return null;const k=-1/c[2];
   const x=W/2+(c[0]*k/tanX)*W/2,y=H/2-(c[1]*k/tanY)*H/2;return [x,y,h]}
-const below=q=>S.L.hor&&S.L.ground&&q[2][2]<-0.01;
+function gndK(){if(!S.L.ground)return 0;const p=camLook(S.rc).alt;return sstep(-32,-6,p)}
+const below=q=>S.L.hor&&(S.gk==null?1:S.gk)>0.5&&q[2][2]<-0.01;
 function projH(h){const c=mv(RcT,h);if(c[2]>=-1e-4)return null;const k=-1/c[2];return [W/2+(c[0]*k/tanX)*W/2,H/2-(c[1]*k/tanY)*H/2]}
 /* ---------- cuerpos ---------- */
 let BODIES=[];
@@ -512,7 +513,7 @@ function label(txt,x,y,o={}){
   ctx.fillStyle=o.col||'#dfe5f6';ctx.shadowColor='#000';ctx.shadowBlur=4;
   if(ls){ctx.letterSpacing=ls+'px'}ctx.textAlign='left';ctx.fillText(txt,x0,y);if(ls)ctx.letterSpacing='0px';ctx.shadowBlur=0;return true}
 function drawOverlay(){
-  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);labels=[];RcT=tr(S.rc);BOTM=S.L.timebar?150:90;
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);labels=[];RcT=tr(S.rc);S.gk=gndK();BOTM=S.L.timebar?150:90;
   const sc=H/ S.fov;                       // px por grado (aprox.)
   const VIS=S.vis==null?1:S.vis;
   // constelaciones: líneas
@@ -624,7 +625,7 @@ function startGyro(){
   const go=()=>{add();setMode('gyro');setTimeout(()=>{if(!S.gotSensor){toast('No llegan datos del sensor: pasa a «Arrastrar»');setMode('drag')}},2500)};
   try{if(D&&typeof D.requestPermission==='function'){D.requestPermission().then(p=>{if(p==='granted')go();else{toast('Permiso de movimiento denegado');setMode('drag')}}).catch(()=>{toast('No se pudo pedir el permiso');setMode('drag')})}else go()}catch(e){setMode('drag')}
 }
-function setMode(m){S.mode=m;if(m==='gyro'){S.rcSmooth=null}else if(S.gy){const l=camLook(S.rc);S.az=l.az;S.alt=Math.max(-5,Math.min(89,l.alt))}
+function setMode(m){S.mode=m;if(m==='gyro'){S.rcSmooth=null}else if(S.gy){const l=camLook(S.rc);S.az=l.az;S.alt=Math.max(-70,Math.min(89,l.alt))}
   $('chMode').textContent=m==='gyro'?'🎯 Giroscopio':'✋ Arrastrar';
   document.querySelectorAll('#segMode button').forEach(b=>b.classList.toggle('a',b.dataset.m===m));dirty=true}
 /* ---------- ubicación / hora ---------- */
@@ -637,7 +638,7 @@ ov.addEventListener('pointerdown',e=>{ov.setPointerCapture(e.pointerId);pts.set(
   if(pts.size===2){const [a,b]=[...pts.values()];pinch0=Math.hypot(a[0]-b[0],a[1]-b[1]);fov0=S.fov}});
 ov.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];p[0]=e.clientX;p[1]=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);
   if(pts.size===2){const [a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch0>0){S.fov=Math.max(6,Math.min(120,fov0*pinch0/d));dirty=true}return}
-  if(S.mode==='drag'){const dpp=S.fov/H;S.az=(S.az-dx*dpp*Math.cos(Math.min(80,Math.abs(S.alt))*D2R*0.5)+360)%360;S.alt=Math.max(-10,Math.min(89.5,S.alt+dy*dpp));dirty=true}
+  if(S.mode==='drag'){const dpp=S.fov/H;S.az=(S.az-dx*dpp*Math.cos(Math.min(80,Math.abs(S.alt))*D2R*0.5)+360)%360;S.alt=Math.max(-70,Math.min(89.5,S.alt+dy*dpp));dirty=true}
   else if(S.mode==='gyro'){S.corr=(S.corr-dx*S.fov/H*0.0)%360}});
 const up=e=>{const wasTap=pts.size===1&&moved<10&&performance.now()-downT<500;pts.delete(e.pointerId);if(pts.size<2)pinch0=0;if(wasTap&&downXY)tap(downXY[0],downXY[1])};
 ov.addEventListener('pointerup',up);ov.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);pinch0=0});
