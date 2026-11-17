@@ -400,7 +400,7 @@ function initGL(){
   void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Position=vec4(p*2.0-1.0,0.0,1.0);}`;
   const fs=`#version 300 es
   precision highp float;
-  uniform sampler2D uTex;uniform sampler2D uHa;uniform float uHaK;uniform float uLodHa;uniform mat3 uEq;uniform mat3 uHor;uniform vec2 uTan;uniform vec2 uRes;uniform float uLod;uniform float uGain;uniform float uHorK;uniform float uGndK;
+  uniform sampler2D uTex;uniform sampler2D uHa;uniform float uHaK;uniform float uLodHa;uniform mat3 uEq;uniform mat3 uHor;uniform vec2 uTan;uniform vec2 uRes;uniform float uLod;uniform float uGain;uniform float uHorK;uniform float uGndK;uniform vec3 uSun;uniform float uSunAlt;
   out vec4 o;const float PI=3.14159265;
   float hill(float a){return 0.028*(sin(a*3.0+1.0)*.5+sin(a*7.0+2.3)*.3+sin(a*17.0+.7)*.15+sin(a*41.0)*.05)+0.02;}
   void main(){
@@ -413,17 +413,33 @@ function initGL(){
     c=pow(c,vec3(1.0/uGain));
     float hv=textureLod(uHa,uv,uLodHa).r;c=1.0-(1.0-c)*(1.0-clamp(hv*uHaK,0.0,1.0)*vec3(0.95,0.22,0.20));
     float alt=asin(clamp(h.z,-1.0,1.0));float az=atan(h.x,h.y);float hh=hill(az);
+    // ---- cielo diurno / crepúsculo según altura del Sol ----
+    float sa=uSunAlt;                                   // grados
+    float starV=1.0-smoothstep(-9.0,3.0,sa);            // visibilidad de estrellas y Vía Láctea
+    float skyK=smoothstep(-17.0,-2.0,sa);               // cuánto cielo "azul" hay
+    float dayK=smoothstep(-3.0,18.0,sa);                // 0 crepúsculo .. 1 pleno día
+    float up=clamp(h.z,0.0,1.0);
+    float cs=clamp(dot(normalize(h),uSun),-1.0,1.0);float ang=acos(cs);
+    vec3 zen=mix(mix(vec3(0.015,0.025,0.07),vec3(0.17,0.21,0.36),smoothstep(-17.0,-5.0,sa)),vec3(0.20,0.46,0.86),dayK);
+    vec3 hor=mix(vec3(0.10,0.14,0.26),vec3(0.62,0.78,0.95),dayK);
+    float tw=smoothstep(-14.0,-3.0,sa)*(1.0-smoothstep(-1.0,22.0,sa));  // intensidad de la banda cálida
+    vec3 warm=mix(vec3(0.95,0.45,0.22),vec3(1.0,0.72,0.42),smoothstep(-6.0,6.0,sa));
+    vec3 sky=mix(hor,zen,pow(up,0.55));
+    sky=mix(sky,warm*0.95,tw*exp(-ang*1.6)*(1.0-0.55*pow(up,0.5)));
+    sky+=warm*exp(-ang*9.0)*0.30*smoothstep(-8.0,2.0,sa);  // halo del Sol
+    sky+=vec3(1.0,0.95,0.85)*exp(-ang*40.0)*0.5*smoothstep(-2.0,4.0,sa);
+    c=c*starV+sky*skyK;
     float d=alt-hh;
     vec3 c0=c;
     c*=mix(1.0,0.45+0.55*smoothstep(0.0,0.35,d),uHorK);
-    c+=vec3(0.07,0.045,0.025)*exp(-max(d,0.0)*14.0)*0.55*uHorK;
+    c+=vec3(0.07,0.045,0.025)*exp(-max(d,0.0)*14.0)*0.55*uHorK*(1.0-skyK);
     float g=mix(1.0,smoothstep(-0.0015,0.0015,d),uHorK);
-    vec3 ground=vec3(0.004,0.005,0.008)+vec3(0.03,0.02,0.012)*exp(d*9.0)*0.35;
+    vec3 ground=vec3(0.004,0.005,0.008)+vec3(0.03,0.02,0.012)*exp(d*9.0)*0.35;ground=mix(ground,vec3(0.16,0.09,0.06)*(0.25+0.75*dayK)*mix(0.4,1.0,exp(-ang*1.2))*exp(max(d,-0.5)*1.5)+ground,skyK);
     o=vec4(mix(mix(c0*0.6,ground,uGndK),c,g),1.0);
   }`;
   const mk=(t,s)=>{const x=G.createShader(t);G.shaderSource(x,s);G.compileShader(x);if(!G.getShaderParameter(x,G.COMPILE_STATUS))console.error(G.getShaderInfoLog(x));return x};
   prog=G.createProgram();G.attachShader(prog,mk(G.VERTEX_SHADER,vs));G.attachShader(prog,mk(G.FRAGMENT_SHADER,fs));G.linkProgram(prog);
-  for(const n of ['uTex','uHa','uHaK','uLodHa','uEq','uHor','uTan','uRes','uLod','uGain','uHorK','uGndK'])U[n]=G.getUniformLocation(prog,n);
+  for(const n of ['uTex','uHa','uHaK','uLodHa','uEq','uHor','uTan','uRes','uLod','uGain','uHorK','uGndK','uSun','uSunAlt'])U[n]=G.getUniformLocation(prog,n);
   G.useProgram(prog);G.bindVertexArray(G.createVertexArray());
   return true;
 }
@@ -455,6 +471,8 @@ function drawGL(){
   const texelRad=TAU/texSize,pxRad=(S.fov*D2R)/gl.height;
   G.uniform1f(U.uLod,Math.max(0,Math.log2(pxRad/texelRad)));
   G.uniform1f(U.uGain,S.bright);G.uniform1f(U.uHorK,S.L.hor?1:0);G.uniform1f(U.uGndK,S.L.ground?1:0);G.uniform1f(U.uHaK,haTex?S.ha:0);G.uniform1f(U.uLodHa,Math.max(0,Math.log2(pxRad/(TAU/4096))));
+  {const sb=BODIES.find(b=>b.id==='Sun');let sh=[0,0,-1],sa=-60;if(sb){sh=mv(SM,eqv(sb.ra,sb.dec));const n=Math.hypot(sh[0],sh[1],sh[2])||1;sh=[sh[0]/n,sh[1]/n,sh[2]/n];sa=Math.asin(Math.max(-1,Math.min(1,sh[2])))*R2D}
+   S.sunAlt=sa;S.vis=1-sstep(-9,3,sa);G.uniform3f(U.uSun,sh[0],sh[1],sh[2]);G.uniform1f(U.uSunAlt,sa)}
   G.uniform1i(U.uTex,0);G.uniform1i(U.uHa,1);G.drawArrays(G.TRIANGLES,0,3);
 }
 /* ---------- proyección 2D ---------- */
@@ -484,6 +502,7 @@ function buildObjs(){
 const nrm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 /* ---------- dibujo del overlay ---------- */
 let dirty=true,labels=[],BOTM=90;
+function sstep(a,b,x){const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)}
 function rectHit(r){for(const q of labels){if(r[0]<q[2]&&r[2]>q[0]&&r[1]<q[3]&&r[3]>q[1])return true}return false}
 function label(txt,x,y,o={}){
   const sz=o.size||12.5;ctx.font=`${o.weight||500} ${sz}px -apple-system,Segoe UI,Roboto,Arial`;
@@ -495,24 +514,25 @@ function label(txt,x,y,o={}){
 function drawOverlay(){
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);labels=[];RcT=tr(S.rc);BOTM=S.L.timebar?150:90;
   const sc=H/ S.fov;                       // px por grado (aprox.)
+  const VIS=S.vis==null?1:S.vis;
   // constelaciones: líneas
-  if(S.L.lines){ctx.strokeStyle='rgba(110,140,225,.30)';ctx.lineWidth=1.1;ctx.beginPath();
+  if(S.L.lines&&VIS>0.05){ctx.globalAlpha=VIS;ctx.strokeStyle='rgba(110,140,225,.30)';ctx.lineWidth=1.1;ctx.beginPath();
     for(const c of DATA.cons)for(const seg of c[3]){let prev=null;for(const p of seg){const q=proj(eqv(p[0],p[1]));if(q&&prev&&!below(q)&&!below(prev)){if(Math.abs(q[0]-prev[0])<W*1.5&&Math.abs(q[1]-prev[1])<H*1.5){ctx.moveTo(prev[0],prev[1]);ctx.lineTo(q[0],q[1])}}prev=q}}
-    ctx.stroke();}
+    ctx.stroke();ctx.globalAlpha=1;}
   // horizonte: marcas cardinales
   const card=[['N',0],['NE',45],['E',90],['SE',135],['S',180],['SO',225],['O',270],['NO',315]];
   if(S.L.hor)for(const [n,a] of card){const h=[Math.sin(a*D2R)*Math.cos(0.03),Math.cos(a*D2R)*Math.cos(0.03),Math.sin(0.03)];const q=projH(h);if(q&&q[0]>10&&q[0]<W-10&&q[1]>60&&q[1]<H-BOTM+10)label(n,q[0],q[1]-6,{align:'center',col:n.length===1?'#ffb25a':'#9aa4bd',size:n.length===1?15:12,weight:700,force:true})}
   // nombres de constelaciones
-  if(S.L.names){for(const c of DATA.cons){if(!c[2])continue;const q=proj(eqv(c[2][0],c[2][1]));if(q&&!below(q)&&q[0]>20&&q[0]<W-20&&q[1]>70&&q[1]<H-BOTM)label(c[1].replace(/ /g,' ').toUpperCase(),q[0],q[1],{align:'center',col:'rgba(138,160,216,.9)',size:12.5,weight:700,ls:2.5})}}
+  if(S.L.names&&VIS>0.25){for(const c of DATA.cons){if(!c[2])continue;const q=proj(eqv(c[2][0],c[2][1]));if(q&&!below(q)&&q[0]>20&&q[0]<W-20&&q[1]>70&&q[1]<H-BOTM)label(c[1].replace(/ /g,' ').toUpperCase(),q[0],q[1],{align:'center',col:'rgba(138,160,216,.9)',size:12.5,weight:700,ls:2.5})}}
   // DSO
   const hit=[];
-  if(S.L.dso){const lim=S.fov<30?99:S.fov<60?9:7.2;
+  if(S.L.dso&&VIS>0.25){const lim=S.fov<30?99:S.fov<60?9:7.2;
     for(const d of DATA.dsos){if(!dsoShow(d))continue;const q=proj(eqv(d[3],d[4]));if(!q||below(q)||q[0]<-30||q[0]>W+30||q[1]<-30||q[1]>H+30)continue;
       const rpx=Math.max(9,(d[6]/60/2)*sc);ctx.strokeStyle='rgba(170,190,235,.85)';ctx.lineWidth=1.2;ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(q[0],q[1],Math.min(rpx,W),0,TAU);ctx.stroke();ctx.setLineDash([]);
       const nm=d[1]||d[0];if(q[1]>70&&q[1]<H-BOTM)label(nm,q[0]+Math.min(rpx,120)*0.72+6,q[1]+4,{col:'#d5ddf2',size:12,fx:q[0]-Math.min(rpx,120)*0.72-6});
       hit.push({o:d,x:q[0],y:q[1],r:Math.min(60,Math.max(rpx,16)),ref:'dso'})}}
   // estrellas con nombre
-  if(S.L.stars){const lim=starLim();
+  if(S.L.stars&&VIS>0.25){const lim=starLim();
     for(const s of DATA.stars){if(s[3]>lim)break;const q=proj(eqv(s[1],s[2]));if(!q||below(q)||q[0]<10||q[0]>W-10||q[1]<70||q[1]>H-BOTM)continue;label(s[0],q[0]+8,q[1]+4,{size:12.5,fx:q[0]-8});hit.push({o:s,x:q[0],y:q[1],r:16,ref:'star'})}}
   // planetas
   if(S.L.planets){for(const b of BODIES){const q=proj(eqv(b.ra,b.dec));if(!q||below(q)||q[1]<40||q[1]>H-BOTM+20)continue;
