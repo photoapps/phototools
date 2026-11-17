@@ -20,9 +20,23 @@ button{font:inherit;color:inherit;background:none;border:0;touch-action:manipula
 #top .chip{position:static;pointer-events:auto}
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#262c3cee;border:1px solid #3a4260;border-radius:18px;padding:8px 14px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:6;white-space:nowrap}
 #toast.on{opacity:1}
-#tbar{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom,0px));height:44px;border-radius:24px;background:#262c3ccc;border:1px solid #3a4260;display:flex;align-items:center;gap:10px;padding:0 12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:5}
-#tbar input{flex:1;min-width:0;accent-color:#ff9d2e}#tbar b{font-size:12.5px;min-width:78px;white-space:nowrap;text-align:right}#tbar .pill{margin:0;white-space:nowrap}#tbar.hide{display:none}
-body.tb #toast{bottom:calc(134px + env(safe-area-inset-bottom,0px))}
+#tbar{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom,0px));border-radius:22px;background:#1b2132d9;border:1px solid #38405e;padding:10px 14px 12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:5;display:flex;flex-direction:column;gap:8px}
+#tbar .tbTop{display:flex;align-items:center;gap:10px}
+#tbar .tbT{display:flex;align-items:baseline;gap:8px;min-width:0}
+#tbar #tbLab{font-size:24px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1}
+#tbar #tbDate{font-size:13px;color:#aab3cf;white-space:nowrap}
+#tbar #tbSun{font-size:11.5px;color:#8f99b8;margin-left:auto;text-align:right;white-space:nowrap}
+#tbar #tbNow{margin:0;white-space:nowrap;font-size:12.5px;padding:6px 12px;background:#ff9d2e;color:#1a1000;font-weight:700;border:0;border-radius:14px;opacity:0;pointer-events:none;transition:opacity .15s}
+#tbar #tbNow.on{opacity:1;pointer-events:auto}
+#tbar .tbTrack{position:relative;height:26px;border-radius:13px;background:#222;overflow:hidden;box-shadow:inset 0 0 0 1px #ffffff1f}
+#tbar .tbTrack::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:#ffffff66;pointer-events:none}
+#tbar input{-webkit-appearance:none;appearance:none;position:absolute;inset:0;width:100%;height:100%;margin:0;background:transparent;touch-action:none}
+#tbar input::-webkit-slider-runnable-track{background:transparent;height:26px}
+#tbar input::-moz-range-track{background:transparent;height:26px}
+#tbar input::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:26px;border-radius:13px;background:#fff;box-shadow:0 1px 6px #0009;border:0}
+#tbar input::-moz-range-thumb{width:30px;height:26px;border-radius:13px;background:#fff;box-shadow:0 1px 6px #0009;border:0}
+#tbar.hide{display:none}
+body.tb #toast{bottom:calc(168px + env(safe-area-inset-bottom,0px))}
 .sheet{position:fixed;left:0;right:0;bottom:0;background:#0f1424f4;border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:16px 18px calc(22px + env(safe-area-inset-bottom,0px));z-index:10;transform:translateY(105%);transition:transform .28s ease;max-height:82vh;overflow:auto;touch-action:pan-y}
 .sheet.open{transform:none}
 .sheet h3{font-size:19px;font-weight:700}.sheet .s{font-size:13px;color:var(--dim);margin-top:2px}
@@ -48,7 +62,7 @@ input[type=range]{width:100%;accent-color:var(--acc);margin-top:6px}
 <canvas id="gl"></canvas><canvas id="ov"></canvas>
 <div id="top"><div class="chip" id="chTime">📍 …</div><div class="chip" id="chMode">🎯 Arrastrar</div></div>
 <div id="toast"></div>
-<div id="tbar"><button type="button" id="tbNow" class="pill">↺ Ahora</button><input type="range" id="tbR" min="-720" max="720" value="0" step="5" aria-label="Hora"><b id="tbLab">--:--</b></div>
+<div id="tbar"><div class="tbTop"><div class="tbT"><b id="tbLab">--:--</b><span id="tbDate">Hoy</span></div><span id="tbSun"></span><button type="button" id="tbNow" class="pill">↺ Ahora</button></div><div class="tbTrack" id="tbTrack"><input type="range" id="tbR" min="-720" max="720" value="0" step="5" aria-label="Hora"></div></div>
 <div id="bar"><button class="rb" id="bLayers" aria-label="Capas">☰</button><div id="comp"><canvas id="cc"></canvas></div><button class="rb" id="bSearch" aria-label="Buscar">⌕</button></div>
 
 <div class="sheet" id="shInfo"><div class="grab"></div><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><h3 id="iName"></h3><div class="s" id="iSub"></div></div><button id="iX" style="font-size:22px;color:var(--dim);padding:0 4px">✕</button></div>
@@ -513,7 +527,7 @@ function label(txt,x,y,o={}){
   ctx.fillStyle=o.col||'#dfe5f6';ctx.shadowColor='#000';ctx.shadowBlur=4;
   if(ls){ctx.letterSpacing=ls+'px'}ctx.textAlign='left';ctx.fillText(txt,x0,y);if(ls)ctx.letterSpacing='0px';ctx.shadowBlur=0;return true}
 function drawOverlay(){
-  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);labels=[];RcT=tr(S.rc);S.gk=gndK();BOTM=S.L.timebar?150:90;
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);labels=[];RcT=tr(S.rc);S.gk=gndK();BOTM=S.L.timebar?178:90;
   const sc=H/ S.fov;                       // px por grado (aprox.)
   const VIS=S.vis==null?1:S.vis;
   // constelaciones: líneas
@@ -631,7 +645,7 @@ function setMode(m){S.mode=m;if(m==='gyro'){S.rcSmooth=null}else if(S.gy){const 
 /* ---------- ubicación / hora ---------- */
 function geo(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.place=S.lat.toFixed(2)+'°, '+S.lon.toFixed(2)+'°';updateBodies();dirty=true},()=>{},{timeout:8000,maximumAge:600000})}
 function updateChips(){const d=new Date(nowMs());const hh=d.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}),dd=d.toLocaleDateString('es',{day:'numeric',month:'short'});
-  const t=`📍 ${S.place} · ${S.tOff?dd+' ':''}${hh}`;if($('chTime').textContent!==t)$('chTime').textContent=t;const cl=clockLbl();if($('tbLab').textContent!==cl)$('tbLab').textContent=cl}
+  const t=`📍 ${S.place} · ${S.tOff?dd+' ':''}${hh}`;if($('chTime').textContent!==t)$('chTime').textContent=t;updateTbar()}
 /* ---------- gestos ---------- */
 const pts=new Map();let pinch0=0,fov0=0,moved=0,downT=0,downXY=null;
 ov.addEventListener('pointerdown',e=>{ov.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;downT=performance.now();downXY=[e.clientX,e.clientY];S.slew=null;
@@ -673,9 +687,27 @@ $('bR').oninput=e=>{S.bright=+e.target.value/100;$('bLab').textContent=e.target.
 $('hR').oninput=e=>{S.ha=+e.target.value/100;$('hLab').textContent=e.target.value+' %';dirty=true};
 const tlbl=v=>v?((v>0?'+':'−')+(Math.abs(v)>=60?(Math.abs(v)/60).toFixed(1)+' h':Math.abs(v)+' min')):'Ahora';
 function clockLbl(){const d=new Date(nowMs()),n=new Date();let t=d.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});if(d.toDateString()!==n.toDateString())t=d.toLocaleDateString('es',{day:'numeric',month:'short'})+' '+t;return t}
-function setT(v){S.tOff=v;$('tR').value=v;$('tbR').value=v;$('tLab').textContent=tlbl(v);$('tbLab').textContent=clockLbl();updateBodies();dirty=true}
+function setT(v){S.tOff=v;$('tR').value=v;$('tbR').value=v;$('tLab').textContent=tlbl(v);updateBodies();updateTbar();dirty=true}
 $('tR').oninput=e=>setT(+e.target.value);$('tbR').oninput=e=>setT(+e.target.value);
 $('tbNow').addEventListener('click',()=>setT(0));
+const SUNST=[[-18,[10,14,30]],[-8,[28,36,78]],[-2,[190,92,56]],[3,[244,168,94]],[12,[124,178,236]],[30,[92,166,240]]];
+function altCol(a){if(a<=SUNST[0][0])return SUNST[0][1];for(let i=1;i<SUNST.length;i++){if(a<=SUNST[i][0]){const [a0,c0]=SUNST[i-1],[a1,c1]=SUNST[i],t=(a-a0)/(a1-a0);return c0.map((v,k)=>Math.round(v+(c1[k]-v)*t))}}return SUNST[SUNST.length-1][1]}
+function sunAltAt(ms){const d=new Date(ms),ob=new Astronomy.Observer(S.lat,S.lon,0),q=Astronomy.Equator(Astronomy.Body.Sun,d,ob,true,true);return Astronomy.Horizon(d,ob,q.ra,q.dec,'normal').altitude}
+function buildTrack(){if(typeof Astronomy==='undefined')return;const b=Date.now(),st=[];
+  for(let m=-720;m<=720;m+=15){const c=altCol(sunAltAt(b+m*60000));st.push(`rgb(${c}) ${((m+720)/1440*100).toFixed(2)}%`)}
+  $('tbTrack').style.background='linear-gradient(90deg,'+st.join(',')+')'}
+let SUNC={k:'',t:''};
+function sunText(){if(typeof Astronomy==='undefined')return'';const d=new Date(nowMs()),k=d.toDateString();if(SUNC.k===k)return SUNC.t;
+  try{const ob=new Astronomy.Observer(S.lat,S.lon,0),d0=new Date(d);d0.setHours(0,0,0,0);
+    const r=Astronomy.SearchRiseSet(Astronomy.Body.Sun,ob,+1,d0,1),n=Astronomy.SearchRiseSet(Astronomy.Body.Sun,ob,-1,d0,1),f=x=>x?x.date.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}):'--';
+    SUNC={k,t:`☀ ${f(r)}  ·  ☾ ${f(n)}`}}catch(e){SUNC={k,t:''}}return SUNC.t}
+function updateTbar(){const d=new Date(nowMs()),n=new Date();
+  const hh=d.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});if($('tbLab').textContent!==hh)$('tbLab').textContent=hh;
+  const same=d.toDateString()===n.toDateString(),dd=same?'Hoy':d.toLocaleDateString('es',{weekday:'short',day:'numeric',month:'short'}).replace('.','');
+  if($('tbDate').textContent!==dd)$('tbDate').textContent=dd;
+  const st=sunText();if($('tbSun').textContent!==st)$('tbSun').textContent=st;
+  $('tbNow').classList.toggle('on',!!S.tOff)}
+buildTrack();setInterval(buildTrack,300000);updateTbar();
 document.body.classList.add('tb');
 function nowReset(e){if(e&&e.cancelable)e.preventDefault();const was=S.tOff;setT(0);toast(was?'Hora actual':'Ya estás en la hora actual')}
 for(const id of ['tNow','tNow2']){const el=$(id);el.addEventListener('click',nowReset);el.addEventListener('touchend',nowReset,{passive:false})}
